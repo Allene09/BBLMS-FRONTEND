@@ -45,7 +45,7 @@ export default function Dashboard() {
         <StatCard icon={FiCalendar} label="Reservations" value={stats.activeReservations} color="text-purple-600" bgColor="bg-purple-100" />
         <StatCard icon={FiTruck} label="Suppliers" value={stats.totalSuppliers} color="text-indigo-600" bgColor="bg-indigo-100" />
         <StatCard icon={FiCheckCircle} label="Returned" value={stats.totalReturned} color="text-emerald-600" bgColor="bg-emerald-100" />
-        <StatCard icon={FiDollarSign} label="Total Fines" value={`₱${stats.totalFines.toFixed(2)}`} color="text-orange-600" bgColor="bg-orange-100" />
+        <StatCard icon={FiDollarSign} label="Total Fines" value={`₱${Number(stats.totalFines ?? 0).toFixed(2)}`} color="text-orange-600" bgColor="bg-orange-100" />
       </div>
 
       {/* Recent Transactions */}

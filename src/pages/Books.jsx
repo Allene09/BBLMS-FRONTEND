@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiSearch, FiX, FiPrinter } from 'react-icons/fi';
 
 const emptyBook = {
@@ -13,6 +14,8 @@ const emptyBook = {
 };
 
 export default function Books() {
+  const { user } = useAuth();
+  const canEdit = ['ADMIN', 'LIBRARIAN'].includes(user?.access_right);
   const [books, setBooks] = useState([]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
@@ -95,9 +98,9 @@ export default function Books() {
       {/* Toolbar */}
       <div className="card mb-4">
         <div className="flex flex-wrap items-center gap-3">
-          <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> New</button>
-          <button className="btn btn-warning" onClick={handleEdit}><FiEdit2 size={16} /> Edit</button>
-          <button className="btn btn-danger" onClick={handleDelete}><FiTrash2 size={16} /> Delete</button>
+          {canEdit && <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> New</button>}
+          {canEdit && <button className="btn btn-warning" onClick={handleEdit}><FiEdit2 size={16} /> Edit</button>}
+          {canEdit && <button className="btn btn-danger" onClick={handleDelete}><FiTrash2 size={16} /> Delete</button>}
           <button className="btn btn-secondary" onClick={fetchBooks}><FiRefreshCw size={16} /> Refresh</button>
 
           <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto">

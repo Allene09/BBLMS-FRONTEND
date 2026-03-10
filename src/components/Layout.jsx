@@ -6,16 +6,21 @@ import {
 } from 'react-icons/fi';
 import { useState } from 'react';
 
+// Which roles can see each nav item. Empty array = all roles.
 const navItems = [
-  { path: '/', icon: FiHome, label: 'Dashboard', end: true },
-  { path: '/books', icon: FiBook, label: 'Library Items' },
-  { path: '/borrowers', icon: FiUsers, label: 'Borrowers' },
-  { path: '/suppliers', icon: FiTruck, label: 'Suppliers' },
-  { path: '/checkout', icon: FiArrowRightCircle, label: 'Check-out' },
-  { path: '/checkin', icon: FiArrowLeftCircle, label: 'Check-in' },
-  { path: '/reservations', icon: FiCalendar, label: 'Reservations' },
-  { path: '/users', icon: FiSettings, label: 'System Users' },
+  { path: '/', icon: FiHome, label: 'Dashboard', end: true,  roles: ['ADMIN', 'LIBRARIAN'] },
+  { path: '/books', icon: FiBook, label: 'Library Items',    roles: [] },
+  { path: '/borrowers', icon: FiUsers, label: 'Borrowers',   roles: ['ADMIN', 'LIBRARIAN'] },
+  { path: '/suppliers', icon: FiTruck, label: 'Suppliers',   roles: ['ADMIN', 'LIBRARIAN'] },
+  { path: '/checkout', icon: FiArrowRightCircle, label: 'Check-out', roles: ['ADMIN', 'LIBRARIAN'] },
+  { path: '/checkin', icon: FiArrowLeftCircle, label: 'Check-in',   roles: ['ADMIN', 'LIBRARIAN'] },
+  { path: '/reservations', icon: FiCalendar, label: 'Reservations', roles: ['ADMIN', 'LIBRARIAN', 'FACULTY'] },
+  { path: '/users', icon: FiSettings, label: 'System Users', roles: ['ADMIN'] },
 ];
+
+function canSee(item, userRole) {
+  return item.roles.length === 0 || item.roles.includes(userRole);
+}
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -56,7 +61,7 @@ export default function Layout() {
 
         {/* Navigation */}
         <nav className="flex-1 py-4 overflow-y-auto">
-          {navItems.map((item) => (
+          {navItems.filter((item) => canSee(item, user?.access_right)).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

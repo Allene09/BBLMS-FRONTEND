@@ -16,10 +16,14 @@ export function AuthProvider({ children }) {
       api.get('/auth/me').then((res) => {
         setUser(res.data);
         localStorage.setItem('user', JSON.stringify(res.data));
-      }).catch(() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
+      }).catch((err) => {
+        // Only force logout on 401 (invalid/expired token).
+        // Network errors or server hiccups should keep the user logged in.
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       }).finally(() => setLoading(false));
     } else {
       setLoading(false);

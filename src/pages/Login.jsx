@@ -21,9 +21,11 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      await login(userId, password);
+      const data = await login(userId, password);
       toast.success('Login successful!');
-      navigate('/');
+      // FACULTY and USER land on the book catalogue; others go to Dashboard
+      const role = data.user?.access_right;
+      navigate(['ADMIN', 'LIBRARIAN'].includes(role) ? '/' : '/books');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Login failed');
     } finally {

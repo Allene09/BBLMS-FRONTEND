@@ -17,19 +17,27 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" />;
 }
 
+// Only allow users whose access_right is in the allowed list
+function RoleRoute({ children, roles }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" />;
+  if (!roles.includes(user.access_right)) return <Navigate to="/books" />;
+  return children;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Dashboard /></RoleRoute>} />
         <Route path="books" element={<Books />} />
-        <Route path="borrowers" element={<Borrowers />} />
-        <Route path="suppliers" element={<Suppliers />} />
-        <Route path="checkout" element={<Checkout />} />
-        <Route path="checkin" element={<Checkin />} />
-        <Route path="reservations" element={<Reservations />} />
-        <Route path="users" element={<Users />} />
+        <Route path="borrowers" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Borrowers /></RoleRoute>} />
+        <Route path="suppliers" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Suppliers /></RoleRoute>} />
+        <Route path="checkout" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Checkout /></RoleRoute>} />
+        <Route path="checkin" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Checkin /></RoleRoute>} />
+        <Route path="reservations" element={<RoleRoute roles={['ADMIN','LIBRARIAN','FACULTY']}><Reservations /></RoleRoute>} />
+        <Route path="users" element={<RoleRoute roles={['ADMIN']}><Users /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
