@@ -99,7 +99,10 @@ export default function Checkin() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Process Returns</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Check-in</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Process book returns and renewals</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="space-y-3">

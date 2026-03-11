@@ -93,7 +93,10 @@ export default function Books() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Library Items Management</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Library Items</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Manage and search the book catalog</p>
+      </div>
 
       {/* Toolbar */}
       <div className="card mb-4">
@@ -157,7 +160,7 @@ export default function Books() {
 
         {/* Details Panel */}
         <div className="card">
-          <h3 className="text-sm font-bold text-blue-800 mb-3 uppercase tracking-wide">Detailed Information</h3>
+          <h3 className="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Book Details</h3>
           {selected ? (
             <div className="space-y-2 text-sm">
               {[

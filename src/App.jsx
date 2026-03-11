@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Books from './pages/Books';
@@ -13,7 +14,14 @@ import Users from './pages/Users';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center h-screen"><div className="text-lg text-gray-500">Loading...</div></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen bg-slate-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-gray-400 font-medium">Loading...</p>
+      </div>
+    </div>
+  );
   return user ? children : <Navigate to="/login" />;
 }
 
@@ -21,15 +29,16 @@ function PrivateRoute({ children }) {
 function RoleRoute({ children, roles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
-  if (!roles.includes(user.access_right)) return <Navigate to="/books" />;
+  if (!roles.includes(user.access_right)) return <Navigate to="/app/books" />;
   return children;
 }
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+      <Route path="/app" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Dashboard /></RoleRoute>} />
         <Route path="books" element={<Books />} />
         <Route path="borrowers" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Borrowers /></RoleRoute>} />
@@ -43,3 +52,4 @@ export default function App() {
     </Routes>
   );
 }
+

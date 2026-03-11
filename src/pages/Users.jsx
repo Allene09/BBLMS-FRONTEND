@@ -69,9 +69,12 @@ export default function Users() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">System Users</h1>
-        <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> Add</button>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">System Users</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Manage user accounts and access rights</p>
+        </div>
+        <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> Add User</button>
       </div>
 
       <div className="card p-0 overflow-hidden">
