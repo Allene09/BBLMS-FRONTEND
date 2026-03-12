@@ -64,10 +64,11 @@ export default function Layout() {
         {/* Logo */}
         <div className="px-5 py-5 flex items-center justify-between border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
-              <FiBook className="text-white" size={17} />
-            </div>
+            <img
+              src="/logo.png"
+              alt="BISU Bilar Library Logo"
+              className="w-10 h-10 object-contain transition-transform group-hover:scale-105 drop-shadow-lg"
+            />
             <div className="leading-tight">
               <p className="text-white font-extrabold text-sm tracking-wide">BISU — BILAR</p>
               <p className="text-xs" style={{ color: '#334155' }}>Library System</p>

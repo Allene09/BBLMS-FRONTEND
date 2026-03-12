@@ -63,10 +63,11 @@ export default function Login() {
         {/* Top logo */}
         <div className="relative">
           <Link to="/" className="inline-flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
-              <FiBook className="text-white" size={20} />
-            </div>
+            <img
+              src="/logo.png"
+              alt="BISU Bilar Library Logo"
+              className="w-12 h-12 object-contain transition-transform group-hover:scale-105 drop-shadow-xl"
+            />
             <div className="leading-tight">
               <p className="text-white font-extrabold text-base">BISU — BILAR</p>
               <p className="text-xs" style={{ color: '#475569' }}>Library Management System</p>
@@ -129,10 +130,11 @@ export default function Login() {
         <div className="max-w-md w-full mx-auto">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
-              <FiBook className="text-white" size={20} />
-            </div>
+            <img
+              src="/logo.png"
+              alt="BISU Bilar Library Logo"
+              className="w-12 h-12 object-contain drop-shadow-md"
+            />
             <div>
               <p className="font-extrabold text-gray-900 text-base">BISU — BILAR</p>
               <p className="text-xs text-gray-400">Library Management System</p>

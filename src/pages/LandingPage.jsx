@@ -130,9 +130,11 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <FiBook className="text-white" size={17} />
-              </div>
+              <img
+                src="/logo.png"
+                alt="BISU Bilar Library Logo"
+                className="w-10 h-10 object-contain drop-shadow-md"
+              />
               <div className="leading-tight">
                 <span className={`font-extrabold text-sm block ${scrolled ? 'text-gray-900' : 'text-white'}`}>BISU — BILAR</span>
                 <span className={`text-xs block ${scrolled ? 'text-gray-400' : 'text-blue-200'}`}>Library Management</span>
@@ -569,9 +571,11 @@ export default function LandingPage() {
                             radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)`
         }} />
         <div className={`max-w-4xl mx-auto px-4 text-center relative ${ctaVisible ? 'anim-scale-in' : 'opacity-0'}`}>
-          <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6">
-            <FiBook className="text-white" size={28} />
-          </div>
+          <img
+            src="/logo.png"
+            alt="BISU Bilar Library Logo"
+            className="w-24 h-24 object-contain mx-auto mb-6 drop-shadow-2xl"
+          />
           <h2 className="text-4xl font-extrabold text-white mb-5 tracking-tight">
             Ready to Modernize<br />Your Library?
           </h2>
@@ -594,9 +598,11 @@ export default function LandingPage() {
             {/* Brand */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
-                  <FiBook className="text-white" size={16} />
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="BISU Bilar Library Logo"
+                  className="w-10 h-10 object-contain"
+                />
                 <div>
                   <p className="text-white font-extrabold text-sm">BISU — BILAR LMS</p>
                   <p className="text-xs" style={{ color: '#334155' }}>Library Management System</p>
