@@ -16,31 +16,9 @@ const statConfigs = [
   { key: '_fines',            label: 'Total Fines',     icon: FiDollarSign,       gradient: 'linear-gradient(135deg,#ea580c,#c2410c)', accent: '#fb923c', bg: 'rgba(234,88,12,0.08)' },
 ];
 
-function StatCard({ cfg, value, index = 0 }) {
-  const isNum = typeof value === 'number';
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isNum) return;
-    let iv = null;
-    const t = setTimeout(() => {
-      let current = 0;
-      const steps = 45;
-      const stepSize = value / steps;
-      iv = setInterval(() => {
-        current = Math.min(current + stepSize, value);
-        setCount(Math.round(current));
-        if (current >= value) clearInterval(iv);
-      }, 20);
-    }, index * 80);
-    return () => { clearTimeout(t); if (iv) clearInterval(iv); };
-  }, [value, isNum, index]);
-
+function StatCard({ cfg, value }) {
   return (
-    <div
-      className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden anim-fade-up"
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden">
       {/* Top accent bar */}
       <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: cfg.gradient }} />
 
@@ -53,7 +31,7 @@ function StatCard({ cfg, value, index = 0 }) {
         </div>
       </div>
 
-      <p className="text-2xl font-black text-gray-900 leading-none mb-1">{isNum ? count : value}</p>
+      <p className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</p>
       <p className="text-xs font-medium text-gray-400">{cfg.label}</p>
     </div>
   );
@@ -112,7 +90,7 @@ export default function Dashboard() {
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-center justify-between mb-7 anim-fade-up">
+      <div className="flex items-center justify-between mb-7">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
           <p className="text-sm text-gray-400 mt-0.5">Library overview and recent activity</p>
@@ -129,13 +107,13 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statConfigs.map((cfg, i) => (
-          <StatCard key={cfg.key} cfg={cfg} value={statValues[cfg.key]} index={i} />
+        {statConfigs.map((cfg) => (
+          <StatCard key={cfg.key} cfg={cfg} value={statValues[cfg.key]} />
         ))}
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden anim-fade-up d-400">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-gray-900">Recent Transactions</h2>
@@ -167,10 +145,10 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {stats.recentLoans.map((loan, li) => {
+                {stats.recentLoans.map((loan) => {
                   const s = statusStyle[loan.status] || { bg: '#f1f5f9', color: '#475569' };
                   return (
-                    <tr key={loan.id} className="anim-fade-up" style={{ animationDelay: `${li * 0.05 + 0.5}s` }}>
+                    <tr key={loan.id}>
                       <td>
                         <span className="font-semibold text-gray-900">{loan.book_title}</span>
                       </td>
