@@ -607,10 +607,10 @@ export default function LandingPage() {
                 />
                 <div>
                   <p className="text-white font-extrabold text-sm">BISU — BILAR LMS</p>
-                  <p className="text-xs" style={{ color: '#334155' }}>Library Management System</p>
+                  <p className="text-xs" style={{ color: '#94a3b8' }}>Library Management System</p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#334155' }}>
+              <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#94a3b8' }}>
                 A modern digital library management solution purpose-built for Bohol Island State University — Bilar Campus.
               </p>
             </div>
@@ -645,7 +645,7 @@ export default function LandingPage() {
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-start gap-2.5 text-sm">
                     <Icon size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span style={{ color: '#334155' }}>{text}</span>
+                    <span style={{ color: '#94a3b8' }}>{text}</span>
                   </div>
                 ))}
               </div>
@@ -653,8 +653,8 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <p className="text-xs" style={{ color: '#1e293b' }}>© 2026 BISU Bilar Library Management System. All rights reserved.</p>
-            <p className="text-xs" style={{ color: '#1e293b' }}>Bohol Island State University — Bilar Campus</p>
+            <p className="text-xs" style={{ color: '#64748b' }}>© 2026 BISU Bilar Library Management System. All rights reserved.</p>
+            <p className="text-xs" style={{ color: '#64748b' }}>Bohol Island State University — Bilar Campus</p>
           </div>
         </div>
       </footer>
