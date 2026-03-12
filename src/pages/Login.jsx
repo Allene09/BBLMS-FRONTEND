@@ -157,7 +157,7 @@ export default function Login() {
             />
             <div className="leading-tight">
               <p className="text-white font-extrabold text-lg tracking-tight">BISU BILAR</p>
-              <p className="text-sm" style={{ color: '#64748b' }}>Library Management System</p>
+              <p className="text-sm text-white">Library Management System</p>
             </div>
           </Link>
         </div>
@@ -178,7 +178,7 @@ export default function Login() {
               System.
             </span>
           </h2>
-          <p className="text-base leading-relaxed mb-10" style={{ color: '#94a3b8', maxWidth: '400px' }}>
+          <p className="text-base leading-relaxed mb-10 text-white" style={{ maxWidth: '400px' }}>
             Seamlessly oversee book inventories, track borrower activity, process active loans, and streamline reservations through a single, sophisticated, and user-friendly platform.
           </p>
 
@@ -196,7 +196,7 @@ export default function Login() {
                     {key && liveStats ? Number(liveStats[key]).toLocaleString() : (value ?? '…')}
                   </span>
                 </div>
-                <p className="text-xs" style={{ color: '#64748b' }}>{label}</p>
+                <p className="text-xs text-white">{label}</p>
               </div>
             ))}
           </div>
@@ -219,7 +219,7 @@ export default function Login() {
                   }}>
                   <Icon style={{ color }} size={18} />
                 </div>
-                <p className="text-sm font-medium" style={{ color: '#cbd5e1' }}>{text}</p>
+                <p className="text-sm font-medium text-white">{text}</p>
               </div>
             ))}
           </div>
@@ -227,7 +227,7 @@ export default function Login() {
 
         {/* Bottom */}
         <div className={`relative flex items-center justify-between transition-all duration-700 delay-200 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-          <p className="text-xs" style={{ color: '#475569' }}>
+          <p className="text-xs text-white">
             © 2026 BISU Bilar Library Management System
           </p>
         </div>

@@ -299,7 +299,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <p className="text-white font-bold text-sm leading-tight">{value}</p>
-                      <p className="text-xs leading-tight" style={{ color: '#64748b' }}>{label}</p>
+                      <p className="text-xs leading-tight text-white">{label}</p>
                     </div>
                   </div>
                 ))}
@@ -462,7 +462,7 @@ export default function LandingPage() {
                 <p className="text-4xl font-black text-white mb-1">
                   {s.key && liveStats ? Number(liveStats[s.key]).toLocaleString() : s.value}
                 </p>
-                <p className="text-sm" style={{ color: '#64748b' }}>{s.label}</p>
+                <p className="text-sm text-white">{s.label}</p>
               </div>
             ))}
           </div>
@@ -594,7 +594,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer style={{ background: '#0a0f1e' }} className="text-slate-400 pt-16 pb-8">
+      <footer style={{ background: '#0a0f1e' }} className="text-white pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             {/* Brand */}
@@ -607,10 +607,10 @@ export default function LandingPage() {
                 />
                 <div>
                   <p className="text-white font-extrabold text-sm">BISU — BILAR LMS</p>
-                  <p className="text-xs" style={{ color: '#94a3b8' }}>Library Management System</p>
+                  <p className="text-xs text-white">Library Management System</p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#94a3b8' }}>
+              <p className="text-sm leading-relaxed max-w-xs text-white">
                 A modern digital library management solution purpose-built for Bohol Island State University — Bilar Campus.
               </p>
             </div>
@@ -645,7 +645,7 @@ export default function LandingPage() {
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-start gap-2.5 text-sm">
                     <Icon size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span style={{ color: '#94a3b8' }}>{text}</span>
+                    <span className="text-white">{text}</span>
                   </div>
                 ))}
               </div>
@@ -653,8 +653,8 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <p className="text-xs" style={{ color: '#64748b' }}>© 2026 BISU Bilar Library Management System. All rights reserved.</p>
-            <p className="text-xs" style={{ color: '#64748b' }}>Bohol Island State University — Bilar Campus</p>
+            <p className="text-xs text-white">© 2026 BISU Bilar Library Management System. All rights reserved.</p>
+            <p className="text-xs text-white">Bohol Island State University — Bilar Campus</p>
           </div>
         </div>
       </footer>
