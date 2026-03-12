@@ -136,7 +136,7 @@ export default function LandingPage() {
                 className="w-10 h-10 object-contain drop-shadow-md"
               />
               <div className="leading-tight">
-                <span className={`font-extrabold text-sm block ${scrolled ? 'text-gray-900' : 'text-white'}`}>BISU — BILAR</span>
+                <span className={`font-extrabold text-sm block ${scrolled ? 'text-gray-900' : 'text-white'}`}>BISU BILAR</span>
                 <span className={`text-xs block ${scrolled ? 'text-gray-400' : 'text-blue-200'}`}>Library Management</span>
               </div>
             </div>
