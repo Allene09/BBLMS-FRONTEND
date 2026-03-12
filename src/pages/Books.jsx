@@ -479,10 +479,10 @@ export default function Books() {
 
             <div>
               <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                <FiList size={14} /> Your Active Loans ({myLoans.filter(l => ['loaned', 'overdue'].includes(l.status?.toLowerCase())).length})
+                <FiList size={14} /> Your Active Loans ({myLoans.length})
               </h3>
               <div className="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
-                {myLoans.filter(l => ['loaned', 'overdue'].includes(l.status?.toLowerCase())).length === 0 ? (
+                {myLoans.length === 0 ? (
                   <div className="text-center text-gray-400 py-8">
                     <FiBookOpen size={24} className="mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No active loans to return</p>
@@ -498,7 +498,7 @@ export default function Books() {
                       </tr>
                     </thead>
                     <tbody>
-                      {myLoans.filter(l => ['loaned', 'overdue'].includes(l.status?.toLowerCase())).map((loan) => (
+                      {myLoans.map((loan) => (
                         <tr key={loan.id} className="border-t hover:bg-gray-50">
                           <td className="p-2 font-medium truncate max-w-[150px]">{loan.book_title}</td>
                           <td className="p-2 text-gray-600 text-xs">{loan.due_date?.split('T')[0]}</td>
