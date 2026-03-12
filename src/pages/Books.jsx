@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiSearch, FiX, FiPrinter } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiSearch, FiX, FiBookOpen, FiCheck, FiList } from 'react-icons/fi';
 
 const emptyBook = {
   title: '', author: '', co_author: '', type: 'Book', publisher: '', place: '',
@@ -24,6 +24,12 @@ export default function Books() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Borrow states
+  const [showBorrowModal, setShowBorrowModal] = useState(false);
+  const [dueDate, setDueDate] = useState('');
+  const [borrowLoading, setBorrowLoading] = useState(false);
+  const [myLoans, setMyLoans] = useState([]);
+
   const fetchBooks = async () => {
     try {
       const res = await api.get('/books', { params: { search: search || undefined } });
@@ -33,7 +39,28 @@ export default function Books() {
     }
   };
 
-  useEffect(() => { fetchBooks(); }, []);
+  const fetchMyLoans = async () => {
+    try {
+      const res = await api.get('/books/my-loans');
+      setMyLoans(res.data);
+    } catch {
+      // Silently fail - user might not have loans
+    }
+  };
+
+  useEffect(() => { 
+    fetchBooks(); 
+    fetchMyLoans();
+  }, []);
+
+  // Set default due date (3 days from now)
+  useEffect(() => {
+    if (showBorrowModal) {
+      const due = new Date();
+      due.setDate(due.getDate() + 3);
+      setDueDate(due.toISOString().split('T')[0]);
+    }
+  }, [showBorrowModal]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -91,6 +118,38 @@ export default function Books() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Borrow handlers
+  const handleBorrowClick = () => {
+    if (!selected) return toast.error('Select a book first');
+    if (selected.copies_available <= 0) return toast.error('No copies available for this book');
+    if (selected.circulation_type === 'Reference' || selected.circulation_type === 'Room-Use Only') {
+      return toast.error('This item is not available for borrowing');
+    }
+    setShowBorrowModal(true);
+  };
+
+  const handleBorrowSubmit = async () => {
+    if (!selected) return;
+    if (!dueDate) return toast.error('Please set a due date');
+
+    setBorrowLoading(true);
+    try {
+      await api.post('/books/borrow', {
+        book_id: selected.id,
+        due_date: dueDate,
+      });
+      toast.success(`Successfully borrowed "${selected.title}"!`);
+      setShowBorrowModal(false);
+      setSelected(null);
+      fetchBooks();
+      fetchMyLoans();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Borrow failed');
+    } finally {
+      setBorrowLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -104,6 +163,9 @@ export default function Books() {
           {canEdit && <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> New</button>}
           {canEdit && <button className="btn btn-warning" onClick={handleEdit}><FiEdit2 size={16} /> Edit</button>}
           {canEdit && <button className="btn btn-danger" onClick={handleDelete}><FiTrash2 size={16} /> Delete</button>}
+          <button className="btn btn-success" onClick={handleBorrowClick}>
+            <FiBookOpen size={16} /> Borrow
+          </button>
           <button className="btn btn-secondary" onClick={fetchBooks}><FiRefreshCw size={16} /> Refresh</button>
 
           <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto">
@@ -189,6 +251,16 @@ export default function Books() {
                   <span className="text-gray-800">{val || 'none'}</span>
                 </div>
               ))}
+              
+              {/* Quick borrow button in details */}
+              {selected.copies_available > 0 && selected.circulation_type === 'Loanable' && (
+                <button 
+                  className="btn btn-success w-full mt-4"
+                  onClick={handleBorrowClick}
+                >
+                  <FiBookOpen size={16} /> Borrow This Book
+                </button>
+              )}
             </div>
           ) : (
             <p className="text-gray-400 text-sm">Select a book to view details</p>
@@ -196,7 +268,7 @@ export default function Books() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Edit/Add Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content max-w-2xl" onClick={(e) => e.stopPropagation()}>
@@ -290,6 +362,80 @@ export default function Books() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Borrow Modal */}
+      {showBorrowModal && selected && (
+        <div className="modal-overlay" onClick={() => setShowBorrowModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-800">Borrow Book</h2>
+              <button onClick={() => setShowBorrowModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Book info */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-xs text-blue-600 font-semibold mb-1">Selected Book</p>
+                <p className="text-base font-bold text-blue-900">{selected.title}</p>
+                <p className="text-sm text-blue-700">{selected.author}</p>
+                <div className="flex gap-4 mt-2 text-xs text-blue-600">
+                  <span>Barcode: {selected.barcode || 'N/A'}</span>
+                  <span>Available: {selected.copies_available}</span>
+                </div>
+              </div>
+
+              {/* Borrower info */}
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                <p className="text-xs text-gray-500 font-semibold mb-1">Borrower</p>
+                <p className="text-base font-bold text-gray-800">{user?.username}</p>
+                <p className="text-sm text-gray-600">ID: {user?.user_id}</p>
+              </div>
+
+              {/* Due date */}
+              <div>
+                <label className="form-label">Due Date *</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+                <p className="text-xs text-gray-400 mt-1">Default: 3 days from today</p>
+              </div>
+
+              {/* My current loans */}
+              {myLoans.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
+                    <FiList size={12} /> Your Current Loans ({myLoans.length})
+                  </p>
+                  <div className="max-h-32 overflow-y-auto border rounded-lg">
+                    {myLoans.map((loan) => (
+                      <div key={loan.id} className="px-3 py-2 border-b last:border-b-0 text-sm flex justify-between items-center">
+                        <span className="truncate max-w-[200px]">{loan.book_title}</span>
+                        <span className={`badge text-xs ${loan.status === 'LOANED' ? 'badge-loaned' : 'badge-overdue'}`}>
+                          Due: {loan.due_date?.split('T')[0]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="button"
+                className="btn btn-success w-full py-3"
+                onClick={handleBorrowSubmit}
+                disabled={borrowLoading}
+              >
+                <FiCheck size={16} /> {borrowLoading ? 'Processing...' : 'Confirm Borrow'}
+              </button>
+            </div>
           </div>
         </div>
       )}

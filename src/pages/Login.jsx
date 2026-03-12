@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { FiLogIn, FiBook, FiUsers, FiArrowRightCircle, FiCalendar, FiArrowLeft, FiEye, FiEyeOff, FiShield, FiClock, FiZap } from 'react-icons/fi';
+import api from '../services/api';
+import { FiLogIn, FiBook, FiUsers, FiArrowRightCircle, FiCalendar, FiArrowLeft, FiEye, FiEyeOff, FiShield, FiClock, FiZap, FiUserPlus, FiX, FiCheck } from 'react-icons/fi';
 
 const highlights = [
   { icon: FiBook,             text: 'Manage your entire book catalog with ease', color: '#60a5fa' },
@@ -16,6 +17,11 @@ const stats = [
   { icon: FiUsers, value: '5K+', label: 'Users' },
   { icon: FiZap, value: '99.9%', label: 'Uptime' },
 ];
+
+const emptySignup = {
+  id_no: '', firstname: '', lastname: '', password: '', confirm_password: '',
+  mobile_phone: '', phone: '', email: '', address: '', notes: '', type: 'STUDENT'
+};
 
 // Floating particles component
 const FloatingParticles = () => (
@@ -47,6 +53,12 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Sign up states
+  const [showSignup, setShowSignup] = useState(false);
+  const [signupForm, setSignupForm] = useState({ ...emptySignup });
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [showSignupPw, setShowSignupPw] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -69,6 +81,38 @@ export default function Login() {
       toast.error(err.response?.data?.error || 'Invalid credentials');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignupChange = (field, value) => {
+    setSignupForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!signupForm.id_no || !signupForm.firstname || !signupForm.lastname || !signupForm.password) {
+      return toast.error('Please fill in all required fields');
+    }
+    if (signupForm.password.length < 6) {
+      return toast.error('Password must be at least 6 characters');
+    }
+    if (signupForm.password !== signupForm.confirm_password) {
+      return toast.error('Passwords do not match');
+    }
+
+    setSignupLoading(true);
+    try {
+      await api.post('/auth/signup', signupForm);
+      toast.success('Account created successfully! You can now sign in.');
+      setShowSignup(false);
+      setSignupForm({ ...emptySignup });
+      setUserId(signupForm.id_no); // Pre-fill login with new ID
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Sign up failed');
+    } finally {
+      setSignupLoading(false);
     }
   };
 
@@ -306,14 +350,235 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Hint */}
-         
+          {/* Sign Up Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-500 text-sm">
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => setShowSignup(true)}
+                className="text-blue-600 font-semibold hover:text-blue-700 transition-colors inline-flex items-center gap-1"
+              >
+                <FiUserPlus size={14} />
+                Sign Up
+              </button>
+            </p>
+          </div>
 
-          <p className="text-center text-gray-400 text-sm mt-10 font-medium">
+          <p className="text-center text-gray-400 text-sm mt-8 font-medium">
             Bohol Island State University — Bilar Campus
           </p>
         </div>
       </div>
+
+      {/* Sign Up Modal */}
+      {showSignup && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowSignup(false)}>
+          <div 
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
+                <p className="text-sm text-gray-500">Fill in your information to register</p>
+              </div>
+              <button 
+                onClick={() => setShowSignup(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSignupSubmit} className="p-6 space-y-6">
+              {/* Account Info */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <FiShield size={14} className="text-blue-500" />
+                  Account Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="form-label">ID No / Student ID *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g., 2024-0001"
+                      value={signupForm.id_no}
+                      onChange={(e) => handleSignupChange('id_no', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showSignupPw ? 'text' : 'password'}
+                        className="form-input pr-10"
+                        placeholder="Min 6 characters"
+                        value={signupForm.password}
+                        onChange={(e) => handleSignupChange('password', e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowSignupPw(!showSignupPw)}
+                      >
+                        {showSignupPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="form-label">Confirm Password *</label>
+                    <input
+                      type={showSignupPw ? 'text' : 'password'}
+                      className="form-input"
+                      placeholder="Repeat password"
+                      value={signupForm.confirm_password}
+                      onChange={(e) => handleSignupChange('confirm_password', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal Info */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <FiUsers size={14} className="text-green-500" />
+                  Personal Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">Firstname *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Enter firstname"
+                      value={signupForm.firstname}
+                      onChange={(e) => handleSignupChange('firstname', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Lastname *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Enter lastname"
+                      value={signupForm.lastname}
+                      onChange={(e) => handleSignupChange('lastname', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Mobile Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="e.g., 09123456789"
+                      value={signupForm.mobile_phone}
+                      onChange={(e) => handleSignupChange('mobile_phone', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Phone</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="Landline (optional)"
+                      value={signupForm.phone}
+                      onChange={(e) => handleSignupChange('phone', e.target.value)}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="form-label">Email</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="your.email@example.com"
+                      value={signupForm.email}
+                      onChange={(e) => handleSignupChange('email', e.target.value)}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="form-label">Address</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Complete address"
+                      value={signupForm.address}
+                      onChange={(e) => handleSignupChange('address', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Type</label>
+                    <select
+                      className="form-input"
+                      value={signupForm.type}
+                      onChange={(e) => handleSignupChange('type', e.target.value)}
+                    >
+                      <option value="STUDENT">Student</option>
+                      <option value="FACULTY">Faculty</option>
+                      <option value="STAFF">Staff</option>
+                      <option value="OTHERS">Others</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Notes</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Additional notes (optional)"
+                      value={signupForm.notes}
+                      onChange={(e) => handleSignupChange('notes', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="flex gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowSignup(false)}
+                  className="flex-1 btn btn-secondary py-3"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={signupLoading}
+                  className="flex-1 py-3 px-6 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                  style={{ 
+                    background: signupLoading ? '#94a3b8' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    boxShadow: signupLoading ? 'none' : '0 4px 16px rgba(16,185,129,0.35)',
+                  }}
+                >
+                  {signupLoading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      <FiCheck size={18} />
+                      Create Account
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* CSS Animations */}
       <style>{`
