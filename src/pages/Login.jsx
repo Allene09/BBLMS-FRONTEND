@@ -524,8 +524,6 @@ export default function Login() {
                       >
                         <option value="STUDENT">Student</option>
                         <option value="FACULTY">Faculty</option>
-                        <option value="STAFF">Staff</option>
-                        <option value="OTHERS">Others</option>
                       </select>
                     </div>
                     <div>
