@@ -239,6 +239,18 @@ body {
   33%       { transform: translate(22px, -28px) scale(1.08); opacity: 0.8; }
   66%       { transform: translate(-16px, 18px) scale(0.94); opacity: 0.45; }
 }
+@keyframes spin360 {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+@keyframes spinRingCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes spinRingCCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
 
 /* ── Animation utility classes ── */
 .anim-fade-up    { animation: fadeInUp    0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
