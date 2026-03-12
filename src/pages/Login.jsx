@@ -243,26 +243,19 @@ export default function Login() {
         </div>
 
         <div className={`max-w-md w-full mx-auto transition-all duration-700 delay-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img
-              src="/logo.png"
-              alt="BISU Bilar Library Logo"
-              className="w-12 h-12 object-contain drop-shadow-md"
-            />
-            <div>
-              <p className="font-extrabold text-gray-900 text-lg">BISU — BILAR</p>
-              <p className="text-sm text-gray-400">Library Management System</p>
-            </div>
+          {/* Back button */}
+          <div className="mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-blue-50 hover:text-blue-600 text-gray-500 transition-all"
+              title="Back to Home"
+            >
+              <FiArrowLeft size={18} />
+            </Link>
           </div>
 
           {/* Welcome section */}
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-4"
-              style={{ background: '#eff6ff', color: '#2563eb' }}>
-              <FiClock size={12} />
-              Quick & Secure Login
-            </div>
             <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Welcome back</h1>
             <p className="text-gray-500 text-base">Sign in to access the library portal.</p>
           </div>
