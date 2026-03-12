@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import api from '../services/api';
@@ -47,14 +47,15 @@ const FloatingParticles = () => (
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Sign up states
-  const [showSignup, setShowSignup] = useState(false);
+  // Sign up states - check if navigated with showSignup state
+  const [showSignup, setShowSignup] = useState(location.state?.showSignup || false);
   const [signupForm, setSignupForm] = useState({ ...emptySignup });
   const [signupLoading, setSignupLoading] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
