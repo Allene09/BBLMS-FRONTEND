@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiSearch, FiX } from 'react-icons/fi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX } from 'react-icons/pi';
 
 const emptySupplier = {
   sup_code: '', company_name: '', address: '', phone: '', fax_no: '',

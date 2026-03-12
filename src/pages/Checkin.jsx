@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { FiSearch, FiCheck, FiX, FiList, FiRotateCw } from 'react-icons/fi';
+import { PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiX as FiX, PiListBullets as FiList, PiArrowClockwise as FiRotateCw } from 'react-icons/pi';
 
 export default function Checkin() {
   const [bookBarcode, setBookBarcode] = useState('');

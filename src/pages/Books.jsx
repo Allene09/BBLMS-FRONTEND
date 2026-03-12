@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiSearch, FiX, FiBookOpen, FiCheck, FiList, FiCornerDownLeft } from 'react-icons/fi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX, PiBookOpen as FiBookOpen, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft } from 'react-icons/pi';
 
 const emptyBook = {
   title: '', author: '', co_author: '', type: 'Book', publisher: '', place: '',

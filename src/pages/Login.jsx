@@ -3,19 +3,13 @@ import { useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import api from '../services/api';
-import { FiLogIn, FiBook, FiUsers, FiArrowRightCircle, FiCalendar, FiArrowLeft, FiEye, FiEyeOff, FiShield, FiClock, FiZap, FiUserPlus, FiX, FiCheck } from 'react-icons/fi';
+import { PiSignIn as FiLogIn, PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiCalendarCheck as FiCalendar, PiArrowLeft as FiArrowLeft, PiEye as FiEye, PiEyeSlash as FiEyeOff, PiShieldCheck as FiShield, PiClock as FiClock, PiLightning as FiZap, PiUserPlus as FiUserPlus, PiX as FiX, PiCheck as FiCheck } from 'react-icons/pi';
 
 const highlights = [
   { icon: FiBook,             text: 'Manage your entire book catalog with ease', color: '#60a5fa' },
   { icon: FiUsers,            text: 'Track borrowers and their loan history', color: '#34d399' },
   { icon: FiArrowRightCircle, text: 'Process checkouts and returns instantly', color: '#f472b6' },
   { icon: FiCalendar,         text: 'Manage reservations and fine collections', color: '#fbbf24' },
-];
-
-const stats = [
-  { icon: FiBook, value: '10K+', label: 'Books' },
-  { icon: FiUsers, value: '5K+', label: 'Users' },
-  { icon: FiZap, value: '99.9%', label: 'Uptime' },
 ];
 
 const emptySignup = {
@@ -60,8 +54,17 @@ export default function Login() {
   const [signupLoading, setSignupLoading] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
 
+  const stats = [
+    { icon: FiBook,  key: 'totalBooks',     label: 'Books' },
+    { icon: FiUsers, key: 'totalBorrowers', label: 'Users' },
+    { icon: FiZap,   value: '99.9%',        label: 'Uptime' },
+  ];
+
+  const [liveStats, setLiveStats] = useState(null);
+
   useEffect(() => {
     setMounted(true);
+    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
   }, []);
 
   if (user) return <Navigate to="/app" />;
@@ -153,7 +156,7 @@ export default function Login() {
               className="w-12 h-12 object-contain transition-transform group-hover:scale-105 drop-shadow-xl"
             />
             <div className="leading-tight">
-              <p className="text-white font-extrabold text-lg tracking-tight">BISU — BILAR</p>
+              <p className="text-white font-extrabold text-lg tracking-tight">BISU BILAR</p>
               <p className="text-sm" style={{ color: '#64748b' }}>Library Management System</p>
             </div>
           </Link>
@@ -161,19 +164,9 @@ export default function Login() {
 
         {/* Center content */}
         <div className={`relative transition-all duration-700 delay-100 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-8"
-            style={{ 
-              background: 'rgba(59,130,246,0.15)', 
-              border: '1px solid rgba(59,130,246,0.3)', 
-              color: '#93c5fd',
-              backdropFilter: 'blur(8px)'
-            }}>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Staff Portal
-          </div>
 
           <h2 className="text-5xl font-black text-white mb-5 leading-tight tracking-tight">
-            Your Library,<br />
+            BISU BILAR Library<br />
             <span className="relative" style={{
               background: 'linear-gradient(90deg, #60a5fa, #34d399, #60a5fa)',
               backgroundSize: '200% 100%',
@@ -181,24 +174,27 @@ export default function Login() {
               WebkitTextFillColor: 'transparent',
               animation: 'shimmer 3s linear infinite',
             }}>
-              Fully Digital.
+              Management 
+              System.
             </span>
           </h2>
           <p className="text-base leading-relaxed mb-10" style={{ color: '#94a3b8', maxWidth: '400px' }}>
-            Manage books, borrowers, loans, reservations, and more — all from one powerful, easy-to-use platform.
+            Seamlessly oversee book inventories, track borrower activity, process active loans, and streamline reservations through a single, sophisticated, and user-friendly platform.
           </p>
 
           {/* Stats row */}
           <div className="flex gap-6 mb-10">
-            {stats.map(({ icon: Icon, value, label }, idx) => (
-              <div 
-                key={label} 
+            {stats.map(({ icon: Icon, value, key, label }, idx) => (
+              <div
+                key={label}
                 className={`transition-all duration-500`}
                 style={{ transitionDelay: `${200 + idx * 100}ms` }}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Icon size={14} style={{ color: '#60a5fa' }} />
-                  <span className="text-2xl font-bold text-white">{value}</span>
+                  <span className="text-2xl font-bold text-white">
+                    {key && liveStats ? Number(liveStats[key]).toLocaleString() : (value ?? '…')}
+                  </span>
                 </div>
                 <p className="text-xs" style={{ color: '#64748b' }}>{label}</p>
               </div>
@@ -234,10 +230,6 @@ export default function Login() {
           <p className="text-xs" style={{ color: '#475569' }}>
             © 2026 BISU Bilar Library Management System
           </p>
-          <div className="flex items-center gap-2 text-xs" style={{ color: '#475569' }}>
-            <FiShield size={12} />
-            <span>Secure Access</span>
-          </div>
         </div>
       </div>
 

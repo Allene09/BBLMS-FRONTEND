@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { FiSearch, FiCalendar, FiX, FiCheck } from 'react-icons/fi';
+import { PiMagnifyingGlass as FiSearch, PiCalendarCheck as FiCalendar, PiX as FiX, PiCheck as FiCheck } from 'react-icons/pi';
 
 export default function Reservations() {
   const [reservations, setReservations] = useState([]);

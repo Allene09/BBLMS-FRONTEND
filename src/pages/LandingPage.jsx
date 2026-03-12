@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../services/api';
 import {
-  FiBook, FiUsers, FiArrowRightCircle, FiCalendar,
-  FiBarChart2, FiShield, FiMenu, FiX, FiCheck,
-  FiArrowRight, FiMail, FiPhone, FiMapPin, FiClock,
-  FiTrendingUp, FiDatabase, FiGlobe, FiStar,
-} from 'react-icons/fi';
+  PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiCalendarCheck as FiCalendar,
+  PiChartBar as FiBarChart2, PiShieldCheck as FiShield, PiList as FiMenu, PiX as FiX, PiCheck as FiCheck,
+  PiArrowRight as FiArrowRight, PiEnvelopeSimple as FiMail, PiPhone as FiPhone, PiMapPin as FiMapPin, PiClock as FiClock,
+  PiTrendUp as FiTrendingUp, PiDatabase as FiDatabase, PiGlobe as FiGlobe, PiStar as FiStar,
+} from 'react-icons/pi';
 
 const features = [
   {
@@ -59,10 +60,10 @@ const features = [
 ];
 
 const stats = [
-  { value: '10,000+', label: 'Books Catalogued', icon: FiBook },
-  { value: '5,000+', label: 'Active Borrowers', icon: FiUsers },
-  { value: '99.9%', label: 'System Uptime', icon: FiTrendingUp },
-  { value: '100%', label: 'Made for BISU', icon: FiStar },
+  { key: 'totalBooks',     label: 'Books Catalogued',  icon: FiBook },
+  { key: 'totalBorrowers', label: 'Active Borrowers',   icon: FiUsers },
+  { value: '99.9%',        label: 'System Uptime',      icon: FiTrendingUp },
+  { value: '100%',         label: 'Made for BISU',      icon: FiStar },
 ];
 
 const steps = [
@@ -110,6 +111,11 @@ export default function LandingPage() {
   const [stepsRef, stepsVisible] = useInView();
   const [aboutRef, aboutVisible] = useInView();
   const [ctaRef,   ctaVisible]   = useInView();
+  const [liveStats, setLiveStats] = useState(null);
+
+  useEffect(() => {
+    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -244,14 +250,9 @@ export default function LandingPage() {
 
             {/* Left content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-7 text-xs font-semibold anim-fade-up"
-                style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#93c5fd' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" style={{ animation: 'pulse 2s infinite' }} />
-                Now Live at BISU Bilar Campus
-              </div>
 
               <h1 className="text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mb-6 anim-fade-up d-100">
-                Modern Library
+                BISU BILAR Library
                 <span className="block mt-1" style={{
                   background: 'linear-gradient(90deg, #60a5fa, #34d399)',
                   WebkitBackgroundClip: 'text',
@@ -262,7 +263,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-lg leading-relaxed mb-10 max-w-lg anim-fade-up d-200" style={{ color: '#93c5fd' }}>
-                Digitize and streamline your library operations. Manage books, borrowers, loans, and reservations — all from one powerful, intuitive platform built for BISU Bilar.
+                Elevating campus library operations through digital innovation. Experience a powerful, easy-to-use platform designed exclusively for BISU Bilar to seamlessly manage book inventories, track borrower activity, and streamline reservations.
               </p>
 
               <div className="flex flex-wrap gap-4 mb-12 anim-fade-up d-300">
@@ -274,7 +275,7 @@ export default function LandingPage() {
                     boxShadow: '0 8px 24px rgba(37,99,235,0.4)',
                   }}
                 >
-                  Access the System <FiArrowRight size={18} />
+                  Get Started <FiArrowRight size={18} />
                 </Link>
                 <a
                   href="#features"
@@ -288,9 +289,9 @@ export default function LandingPage() {
               {/* Mini stats */}
               <div className="flex flex-wrap gap-8 anim-fade-up d-400">
                 {[
-                  { icon: FiBook, label: 'Books Tracked', value: '10,000+' },
-                  { icon: FiUsers, label: 'Borrowers', value: '5,000+' },
-                  { icon: FiTrendingUp, label: 'Availability', value: '99.9%' },
+                  { icon: FiBook,       label: 'Books Tracked', value: liveStats ? Number(liveStats.totalBooks).toLocaleString()     : '…' },
+                  { icon: FiUsers,      label: 'Borrowers',     value: liveStats ? Number(liveStats.totalBorrowers).toLocaleString() : '…' },
+                  { icon: FiTrendingUp, label: 'Active Loans',  value: liveStats ? Number(liveStats.activeLoans).toLocaleString()    : '…' },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.15)' }}>
@@ -458,7 +459,9 @@ export default function LandingPage() {
                   style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
                   <s.icon style={{ color: '#60a5fa' }} size={20} />
                 </div>
-                <p className="text-4xl font-black text-white mb-1">{s.value}</p>
+                <p className="text-4xl font-black text-white mb-1">
+                  {s.key && liveStats ? Number(liveStats[s.key]).toLocaleString() : s.value}
+                </p>
                 <p className="text-sm" style={{ color: '#64748b' }}>{s.label}</p>
               </div>
             ))}
