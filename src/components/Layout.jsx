@@ -1,10 +1,10 @@
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  FiHome, FiBook, FiUsers, FiTruck, FiLogOut,
-  FiArrowRightCircle, FiArrowLeftCircle, FiCalendar, FiSettings, FiMenu, FiX,
-  FiChevronRight,
-} from 'react-icons/fi';
+  PiHouseSimple as FiHome, PiBooks as FiBook, PiUsersThree as FiUsers, PiTruck as FiTruck, PiSignOut as FiLogOut,
+  PiArrowCircleRight as FiArrowRightCircle, PiArrowCircleLeft as FiArrowLeftCircle, PiCalendarCheck as FiCalendar,
+  PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight,
+} from 'react-icons/pi';
 import { useState } from 'react';
 
 const navItems = [

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import {
-  FiBook, FiUsers, FiArrowRightCircle, FiAlertTriangle,
-  FiCalendar, FiTruck, FiCheckCircle, FiDollarSign, FiTrendingUp, FiRefreshCw,
-} from 'react-icons/fi';
+  PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiWarning as FiAlertTriangle,
+  PiCalendarCheck as FiCalendar, PiTruck as FiTruck, PiCheckCircle as FiCheckCircle, PiCurrencyDollar as FiDollarSign,
+  PiTrendUp as FiTrendingUp, PiArrowsClockwise as FiRefreshCw,
+} from 'react-icons/pi';
 
 const statConfigs = [
   { key: 'totalBooks',        label: 'Total Books',     icon: FiBook,             gradient: 'linear-gradient(135deg,#2563eb,#1d4ed8)', accent: '#60a5fa', bg: 'rgba(37,99,235,0.08)' },
