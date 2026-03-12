@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiShield, FiBook, FiSearch, FiCheck, FiList } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiShield, FiBook, FiSearch, FiCheck, FiList, FiCornerDownLeft } from 'react-icons/fi';
 
 const emptyUser = {
   user_id: '', username: '', password: '', designation: '',
@@ -24,6 +24,12 @@ export default function Users() {
   const [dueDate, setDueDate] = useState('');
   const [borrowLoading, setBorrowLoading] = useState(false);
   const [userLoans, setUserLoans] = useState([]);
+
+  // Return book states
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnUser, setReturnUser] = useState(null);
+  const [returnLoans, setReturnLoans] = useState([]);
+  const [returnLoading, setReturnLoading] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -140,6 +146,36 @@ export default function Users() {
 
   const filteredBooks = books.filter(b => b.copies_available > 0 || selectedBook?.id === b.id);
 
+  // Return book handlers
+  const handleReturnClick = async (user) => {
+    setReturnUser(user);
+    setShowReturnModal(true);
+    try {
+      const loansRes = await api.get(`/users/${user.id}/loans`).catch(() => ({ data: [] }));
+      setReturnLoans(loansRes.data.filter(l => ['loaned', 'overdue'].includes(l.status?.toLowerCase())));
+    } catch {
+      toast.error('Failed to load loans');
+    }
+  };
+
+  const handleReturnBook = async (loan) => {
+    if (!window.confirm(`Return "${loan.book_title}"?`)) return;
+    setReturnLoading(true);
+    try {
+      await api.post(`/transactions/checkin/${loan.id}`, {
+        return_date: new Date().toISOString().split('T')[0],
+      });
+      toast.success(`"${loan.book_title}" returned successfully!`);
+      // Refresh loans
+      const loansRes = await api.get(`/users/${returnUser.id}/loans`).catch(() => ({ data: [] }));
+      setReturnLoans(loansRes.data.filter(l => ['loaned', 'overdue'].includes(l.status?.toLowerCase())));
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Return failed');
+    } finally {
+      setReturnLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -183,6 +219,9 @@ export default function Users() {
                     <div className="flex gap-2">
                       <button className="btn btn-success text-xs py-1 px-2" onClick={() => handleBorrowClick(u)}>
                         <FiBook size={14} /> Borrow
+                      </button>
+                      <button className="btn btn-info text-xs py-1 px-2" onClick={() => handleReturnClick(u)}>
+                        <FiCornerDownLeft size={14} /> Return
                       </button>
                       <button className="btn btn-warning text-xs py-1 px-2" onClick={() => handleEdit(u)}>
                         <FiEdit2 size={14} /> Edit
@@ -372,7 +411,7 @@ export default function Users() {
                             <td className="p-2 font-medium truncate max-w-[150px]">{loan.book_title}</td>
                             <td className="p-2 text-gray-600 text-xs">{loan.due_date?.split('T')[0]}</td>
                             <td className="p-2 text-center">
-                              <span className={`badge ${loan.status === 'LOANED' ? 'badge-loaned' : loan.status === 'OVERDUE' ? 'badge-overdue' : 'badge-returned'}`}>
+                              <span className={`badge ${loan.status?.toLowerCase() === 'loaned' ? 'badge-loaned' : loan.status?.toLowerCase() === 'overdue' ? 'badge-overdue' : 'badge-returned'}`}>
                                 {loan.status}
                               </span>
                             </td>
@@ -383,6 +422,72 @@ export default function Users() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Return Book Modal */}
+      {showReturnModal && returnUser && (
+        <div className="modal-overlay" onClick={() => setShowReturnModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '550px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">Return Book</h2>
+                <p className="text-sm text-gray-500">User: <span className="font-semibold text-blue-600">{returnUser.username}</span> ({returnUser.user_id})</p>
+              </div>
+              <button onClick={() => setShowReturnModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <FiList size={14} /> Active Loans ({returnLoans.length})
+              </h3>
+              <div className="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
+                {returnLoans.length === 0 ? (
+                  <div className="text-center text-gray-400 py-8">
+                    <FiBook size={24} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No active loans to return</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="text-left p-2 font-semibold text-gray-600">Book</th>
+                        <th className="text-left p-2 font-semibold text-gray-600">Due Date</th>
+                        <th className="text-center p-2 font-semibold text-gray-600">Status</th>
+                        <th className="text-center p-2 font-semibold text-gray-600">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {returnLoans.map((loan) => (
+                        <tr key={loan.id} className="border-t hover:bg-gray-50">
+                          <td className="p-2 font-medium truncate max-w-[150px]">{loan.book_title}</td>
+                          <td className="p-2 text-gray-600 text-xs">{loan.due_date?.split('T')[0]}</td>
+                          <td className="p-2 text-center">
+                            <span className={`badge ${loan.status?.toLowerCase() === 'overdue' ? 'badge-overdue' : 'badge-loaned'}`}>
+                              {loan.status}
+                            </span>
+                          </td>
+                          <td className="p-2 text-center">
+                            <button
+                              className="btn btn-success text-xs py-1 px-2"
+                              onClick={() => handleReturnBook(loan)}
+                              disabled={returnLoading}
+                            >
+                              <FiCornerDownLeft size={12} /> Return
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowReturnModal(false)}>Close</button>
             </div>
           </div>
         </div>
