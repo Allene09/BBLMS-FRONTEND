@@ -45,7 +45,7 @@ export default function Login() {
 
       {/* ── Left branding panel ── */}
       <div
-        className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden"
+        className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden anim-fade-left"
         style={{ background: 'linear-gradient(140deg, #0f172a 0%, #1e3a5f 50%, #1a1a3e 100%)' }}
       >
         {/* Background decoration */}
@@ -97,8 +97,8 @@ export default function Login() {
           </p>
 
           <div className="space-y-4">
-            {highlights.map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-3">
+            {highlights.map(({ icon: Icon, text }, hi) => (
+              <div key={text} style={{ animationDelay: `${hi * 0.1 + 0.3}s` }} className="flex items-center gap-3 anim-fade-up">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{ background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(59,130,246,0.2)' }}>
                   <Icon style={{ color: '#60a5fa' }} size={15} />
@@ -118,7 +118,7 @@ export default function Login() {
       </div>
 
       {/* ── Right form panel ── */}
-      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16 bg-white">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16 bg-white anim-fade-right">
         {/* Back link (mobile only) */}
         <div className="lg:hidden mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium">
@@ -139,10 +139,10 @@ export default function Login() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-1 tracking-tight">Welcome back</h1>
-          <p className="text-gray-400 text-sm mb-9">Sign in to access the library portal.</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-1 tracking-tight anim-fade-up d-100">Welcome back</h1>
+          <p className="text-gray-400 text-sm mb-9 anim-fade-up d-200">Sign in to access the library portal.</p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 anim-fade-up d-300">
             {/* User ID */}
             <div>
               <label className="form-label">User ID</label>

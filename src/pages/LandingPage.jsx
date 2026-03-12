@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FiBook, FiUsers, FiArrowRightCircle, FiCalendar,
@@ -86,9 +86,30 @@ const steps = [
   },
 ];
 
+function useInView(threshold = 0.12) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, visible];
+}
+
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [featRef, featVisible]   = useInView();
+  const [statsRef, statsVisible] = useInView();
+  const [stepsRef, stepsVisible] = useInView();
+  const [aboutRef, aboutVisible] = useInView();
+  const [ctaRef, ctaVisible]     = useInView();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -120,6 +141,14 @@ export default function LandingPage() {
 
             {/* Desktop links */}
             <div className="hidden md:flex items-center gap-8">
+              <a
+                href="#"
+                className={`text-sm font-medium transition-colors ${
+                  scrolled ? 'text-gray-600 hover:text-blue-600' : 'text-blue-100 hover:text-white'
+                }`}
+              >
+                Home
+              </a>
               {['#features', '#how-it-works', '#about'].map((href, i) => (
                 <a
                   key={href}
@@ -164,6 +193,13 @@ export default function LandingPage() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-1 shadow-xl">
+            <a
+              href="#"
+              className="block text-sm text-gray-700 py-2.5 font-medium"
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </a>
             {['#features', '#how-it-works', '#about'].map((href, i) => (
               <a
                 key={href}
@@ -207,19 +243,26 @@ export default function LandingPage() {
           `,
           backgroundSize: '64px 64px'
         }} />
+        {/* Animated floating orbs */}
+        <div className="absolute top-1/4 left-[12%] w-52 h-52 rounded-full pointer-events-none anim-orb"
+          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.13), transparent 70%)' }} />
+        <div className="absolute bottom-1/3 right-[10%] w-40 h-40 rounded-full pointer-events-none anim-orb d-500"
+          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.13), transparent 70%)', animationDuration: '13s' }} />
+        <div className="absolute top-3/4 left-1/2 w-28 h-28 rounded-full pointer-events-none anim-orb d-300"
+          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.1), transparent 70%)', animationDuration: '16s' }} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative w-full">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
 
             {/* Left content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-7 text-xs font-semibold"
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-7 text-xs font-semibold anim-fade-up"
                 style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#93c5fd' }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" style={{ animation: 'pulse 2s infinite' }} />
                 Now Live at BISU Bilar Campus
               </div>
 
-              <h1 className="text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mb-6">
+              <h1 className="text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mb-6 anim-fade-up d-100">
                 Modern Library
                 <span className="block mt-1" style={{
                   background: 'linear-gradient(90deg, #60a5fa, #34d399)',
@@ -230,11 +273,11 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p className="text-lg leading-relaxed mb-10 max-w-lg" style={{ color: '#93c5fd' }}>
+              <p className="text-lg leading-relaxed mb-10 max-w-lg anim-fade-up d-200" style={{ color: '#93c5fd' }}>
                 Digitize and streamline your library operations. Manage books, borrowers, loans, and reservations — all from one powerful, intuitive platform built for BISU Bilar.
               </p>
 
-              <div className="flex flex-wrap gap-4 mb-12">
+              <div className="flex flex-wrap gap-4 mb-12 anim-fade-up d-300">
                 <Link
                   to="/login"
                   className="inline-flex items-center gap-2 px-7 py-3.5 font-bold text-white rounded-xl transition-all hover:-translate-y-1"
@@ -255,7 +298,7 @@ export default function LandingPage() {
               </div>
 
               {/* Mini stats */}
-              <div className="flex flex-wrap gap-8">
+              <div className="flex flex-wrap gap-8 anim-fade-up d-400">
                 {[
                   { icon: FiBook, label: 'Books Tracked', value: '10,000+' },
                   { icon: FiUsers, label: 'Borrowers', value: '5,000+' },
@@ -275,7 +318,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right — Dashboard mockup */}
-            <div className="hidden lg:block">
+            <div className="hidden lg:block anim-fade-right d-200 anim-float" style={{ animationName: 'fadeInRight, floatY', animationDuration: '0.7s, 6s', animationDelay: '200ms, 1s', animationTimingFunction: 'cubic-bezier(0.16,1,0.3,1), ease-in-out', animationFillMode: 'both, none', animationIterationCount: '1, infinite' }}>
               <div className="relative">
                 <div className="absolute -inset-6 rounded-3xl" style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.2), transparent 70%)' }} />
                 <div className="relative rounded-2xl overflow-hidden border shadow-2xl" style={{
@@ -368,9 +411,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ── */}
-      <section id="features" className="py-24 bg-white">
+      <section id="features" className="py-24 bg-white" ref={featRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 ${featVisible ? 'anim-fade-up' : 'opacity-0'}`}>
             <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
               Features
             </span>
@@ -381,10 +424,11 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((f) => (
+            {features.map((f, fi) => (
               <div
                 key={f.title}
-                className={`group p-7 rounded-2xl border ${f.border} hover:shadow-xl transition-all duration-300 cursor-default bg-white hover:-translate-y-1`}
+                style={{ animationDelay: `${fi * 0.1}s` }}
+                className={`group p-7 rounded-2xl border ${f.border} hover:shadow-xl transition-all duration-300 cursor-default bg-white hover:-translate-y-1 ${featVisible ? 'anim-fade-up' : 'opacity-0'}`}
               >
                 <div className={`w-12 h-12 ${f.bg} ${f.border} border rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                   <f.icon className={f.color} size={22} />
@@ -398,7 +442,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stats bar ── */}
-      <section className="py-20 relative overflow-hidden" style={{
+      <section className="py-20 relative overflow-hidden" ref={statsRef} style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%)',
       }}>
         <div className="absolute inset-0 opacity-[0.05]" style={{
@@ -407,8 +451,8 @@ export default function LandingPage() {
         }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center group">
+            {stats.map((s, si) => (
+              <div key={s.label} style={{ animationDelay: `${si * 0.15}s` }} className={`text-center group ${statsVisible ? 'anim-scale-in' : 'opacity-0'}`}>
                 <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center border transition-colors group-hover:bg-blue-600/20"
                   style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
                   <s.icon style={{ color: '#60a5fa' }} size={20} />
@@ -422,9 +466,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section id="how-it-works" className="py-24 bg-gray-50">
+      <section id="how-it-works" className="py-24 bg-gray-50" ref={stepsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 ${stepsVisible ? 'anim-fade-up' : 'opacity-0'}`}>
             <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
               How It Works
             </span>
@@ -439,7 +483,7 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-16 left-[33%] right-[33%] h-px border-t-2 border-dashed border-blue-200" />
 
             {steps.map((s, i) => (
-              <div key={s.step} className="relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all">
+              <div key={s.step} style={{ animationDelay: `${i * 0.15 + 0.1}s` }} className={`relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all ${stepsVisible ? 'anim-fade-up' : 'opacity-0'}`}>
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shadow-sm"
                     style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)', color: '#fff' }}>
@@ -458,10 +502,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── About ── */}
-      <section id="about" className="py-24 bg-white">
+      <section id="about" className="py-24 bg-white" ref={aboutRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
+            <div className={aboutVisible ? 'anim-fade-left' : 'opacity-0'}>
               <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
                 About
               </span>
@@ -492,7 +536,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl p-10 border border-blue-100" style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
+            <div className={`rounded-3xl p-10 border border-blue-100 ${aboutVisible ? 'anim-fade-right d-200' : 'opacity-0'}`} style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
               <div className="space-y-6">
                 {[
                   { icon: FiDatabase, title: 'Centralized Database', desc: 'All library data in one secure SQLite database with full backup capability and zero reliance on external servers.' },
@@ -517,14 +561,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-24 relative overflow-hidden" style={{
+      <section className="py-24 relative overflow-hidden" ref={ctaRef} style={{
         background: 'linear-gradient(135deg, #1d4ed8 0%, #4f46e5 100%)',
       }}>
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
                             radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)`
         }} />
-        <div className="max-w-4xl mx-auto px-4 text-center relative">
+        <div className={`max-w-4xl mx-auto px-4 text-center relative ${ctaVisible ? 'anim-scale-in' : 'opacity-0'}`}>
           <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6">
             <FiBook className="text-white" size={28} />
           </div>
