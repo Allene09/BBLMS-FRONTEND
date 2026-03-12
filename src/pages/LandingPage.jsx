@@ -395,7 +395,7 @@ export default function LandingPage() {
 
                 {/* Label beneath */}
                 <div className="absolute -bottom-8 left-0 right-0 flex flex-col items-center gap-1">
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'rgba(148,163,184,0.7)', letterSpacing: '0.15em' }}>
+                  <p className="text-xs font-bold tracking-widest uppercase text-white" style={{ letterSpacing: '0.15em' }}>
                     BISU Bilar Campus
                   </p>
                 </div>
