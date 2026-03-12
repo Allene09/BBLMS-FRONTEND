@@ -195,10 +195,11 @@ export default function Books() {
 
           <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto">
             <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
               <input
                 type="text"
-                className="form-input pl-9 w-64"
+                className="form-input w-64"
+                style={{ paddingLeft: '2.5rem' }}
                 placeholder="Search books..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
