@@ -146,13 +146,11 @@ export default function Login() {
         {/* Top logo */}
         <div className={`relative transition-all duration-700 ${mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
           <Link to="/" className="inline-flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300"
-              style={{ 
-                background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-                boxShadow: '0 8px 32px rgba(37,99,235,0.4)'
-              }}>
-              <FiBook className="text-white" size={22} />
-            </div>
+            <img
+              src="/logo.png"
+              alt="BISU Bilar Library Logo"
+              className="w-12 h-12 object-contain transition-transform group-hover:scale-105 drop-shadow-xl"
+            />
             <div className="leading-tight">
               <p className="text-white font-extrabold text-lg tracking-tight">BISU — BILAR</p>
               <p className="text-sm" style={{ color: '#64748b' }}>Library Management System</p>
@@ -254,13 +252,11 @@ export default function Login() {
         <div className={`max-w-md w-full mx-auto transition-all duration-700 delay-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-              style={{ 
-                background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
-                boxShadow: '0 8px 24px rgba(37,99,235,0.3)'
-              }}>
-              <FiBook className="text-white" size={22} />
-            </div>
+            <img
+              src="/logo.png"
+              alt="BISU Bilar Library Logo"
+              className="w-12 h-12 object-contain drop-shadow-md"
+            />
             <div>
               <p className="font-extrabold text-gray-900 text-lg">BISU — BILAR</p>
               <p className="text-sm text-gray-400">Library Management System</p>
