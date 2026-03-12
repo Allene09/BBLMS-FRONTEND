@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import {
   FiBook, FiUsers, FiArrowRightCircle, FiAlertTriangle,
@@ -16,9 +16,58 @@ const statConfigs = [
   { key: '_fines',            label: 'Total Fines',     icon: FiDollarSign,       gradient: 'linear-gradient(135deg,#ea580c,#c2410c)', accent: '#fb923c', bg: 'rgba(234,88,12,0.08)' },
 ];
 
-function StatCard({ cfg, value }) {
+function useCountUp(target, active) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    const num = parseFloat(String(target).replace(/[^0-9.]/g, ''));
+    if (isNaN(num) || num === 0) { setCount(num || 0); return; }
+    const duration = 900;
+    const steps = 40;
+    const increment = num / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current = Math.min(current + increment, num);
+      setCount(current);
+      if (current >= num) clearInterval(interval);
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [active, target]);
+  return count;
+}
+
+function StatCard({ cfg, value, index }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const count = useCountUp(value, visible);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const isNumeric = !isNaN(parseFloat(String(value).replace(/[^0-9.]/g, ''))) && String(value).replace(/[^0-9.]/g, '') !== '';
+  const isFine = String(value).startsWith('₱');
+  const displayValue = visible && isNumeric
+    ? isFine
+      ? `₱${parseFloat(String(value).replace('₱', '')).toFixed(2) === count.toFixed(2) ? count.toFixed(2) : count.toFixed(2)}`
+      : Math.round(count)
+    : value;
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden">
+    <div
+      ref={ref}
+      style={{ animationDelay: `${index * 80}ms` }}
+      className={`bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden ${
+        visible ? 'anim-fade-up' : 'opacity-0'
+      }`}
+    >
       {/* Top accent bar */}
       <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: cfg.gradient }} />
 
@@ -31,7 +80,7 @@ function StatCard({ cfg, value }) {
         </div>
       </div>
 
-      <p className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</p>
+      <p className="text-2xl font-black text-gray-900 leading-none mb-1">{displayValue}</p>
       <p className="text-xs font-medium text-gray-400">{cfg.label}</p>
     </div>
   );
@@ -107,8 +156,8 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statConfigs.map((cfg) => (
-          <StatCard key={cfg.key} cfg={cfg} value={statValues[cfg.key]} />
+        {statConfigs.map((cfg, i) => (
+          <StatCard key={cfg.key} cfg={cfg} value={statValues[cfg.key]} index={i} />
         ))}
       </div>
 
