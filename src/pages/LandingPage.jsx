@@ -136,14 +136,14 @@ export default function LandingPage() {
                 className="w-10 h-10 object-contain drop-shadow-md"
               />
               <div className="leading-tight">
-                <span className={`font-extrabold text-sm block ${scrolled ? 'text-gray-900' : 'text-white'}`}>BISU — BILAR</span>
+                <span className={`font-extrabold text-sm block ${scrolled ? 'text-gray-900' : 'text-white'}`}>BISU BILAR</span>
                 <span className={`text-xs block ${scrolled ? 'text-gray-400' : 'text-blue-200'}`}>Library Management</span>
               </div>
             </div>
 
             {/* Desktop links */}
             <div className="hidden md:flex items-center gap-8">
-              {['#features', '#how-it-works', '#about'].map((href, i) => (
+              {['#', '#features', '#how-it-works', '#about'].map((href, i) => (
                 <a
                   key={href}
                   href={href}
@@ -151,7 +151,7 @@ export default function LandingPage() {
                     scrolled ? 'text-gray-600 hover:text-blue-600' : 'text-blue-100 hover:text-white'
                   }`}
                 >
-                  {['Features', 'How It Works', 'About'][i]}
+                  {['Home', 'Features', 'How It Works', 'About'][i]}
                 </a>
               ))}
             </div>
@@ -188,14 +188,14 @@ export default function LandingPage() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-1 shadow-xl">
-            {['#features', '#how-it-works', '#about'].map((href, i) => (
+            {['#', '#features', '#how-it-works', '#about'].map((href, i) => (
               <a
                 key={href}
                 href={href}
                 className="block text-sm text-gray-700 py-2.5 font-medium"
                 onClick={() => setMenuOpen(false)}
               >
-                {['Features', 'How It Works', 'About'][i]}
+                {['Home', 'Features', 'How It Works', 'About'][i]}
               </a>
             ))}
             <div className="pt-2 border-t border-gray-100 mt-2">
@@ -305,85 +305,98 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right — Dashboard mockup */}
-            <div className="hidden lg:block" style={{ animation: 'fadeInRight 0.7s cubic-bezier(0.16,1,0.3,1) 200ms both, floatY 6s ease-in-out 1s infinite' }}>
-              <div className="relative">
-                <div className="absolute -inset-6 rounded-3xl" style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.2), transparent 70%)' }} />
-                <div className="relative rounded-2xl overflow-hidden border shadow-2xl" style={{
-                  background: 'rgba(15,23,42,0.85)',
-                  borderColor: 'rgba(255,255,255,0.08)',
-                  backdropFilter: 'blur(12px)',
-                }}>
-                  {/* Browser chrome */}
-                  <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ background: 'rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.05)' }}>
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+            {/* Right — Dual Logo 360° Coin Flip */}
+            <div className="hidden lg:flex items-center justify-center anim-fade-right d-200">
+              <div className="relative flex items-center justify-center" style={{ width: '750px', height: '750px' }}>
+
+                {/* Outer ambient glow */}
+                <div className="absolute inset-0 rounded-full" style={{
+                  background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)',
+                  filter: 'blur(20px)',
+                }} />
+
+                {/* Spinning dashed orbit rings */}
+                <div className="absolute rounded-full border border-dashed" style={{
+                  width: '700px', height: '700px',
+                  borderColor: 'rgba(96,165,250,0.18)',
+                  animation: 'spinRingCW 18s linear infinite',
+                }} />
+                <div className="absolute rounded-full border" style={{
+                  width: '650px', height: '650px',
+                  borderColor: 'rgba(167,139,250,0.12)',
+                  animation: 'spinRingCCW 24s linear infinite',
+                }} />
+
+                {/* Dot accents on the outer ring */}
+                {[0, 90, 180, 270].map((deg) => (
+                  <div
+                    key={deg}
+                    className="absolute w-2 h-2 rounded-full"
+                    style={{
+                      background: 'rgba(96,165,250,0.5)',
+                      top: `calc(50% - 4px + ${Math.sin((deg * Math.PI) / 180) * 365}px)`,
+                      left: `calc(50% - 4px + ${Math.cos((deg * Math.PI) / 180) * 365}px)`,
+                      boxShadow: '0 0 8px rgba(96,165,250,0.8)',
+                    }}
+                  />
+                ))}
+
+                {/* 3D coin-flip wrapper */}
+                <div style={{ perspective: '1800px' }}>
+                  <div style={{
+                    width: '540px',
+                    height: '540px',
+                    position: 'relative',
+                    transformStyle: 'preserve-3d',
+                    animation: 'spin360 4s linear infinite',
+                  }}>
+
+                    {/* Front face — Library Management System logo */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                    }}>
+                      <img
+                        src="/logo.png"
+                        alt="BISU Bilar Library Management System"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          filter: 'drop-shadow(0 0 28px rgba(59,130,246,0.65)) drop-shadow(0 4px 16px rgba(0,0,0,0.4))',
+                        }}
+                      />
                     </div>
-                    <div className="flex-1 mx-3 h-5 rounded text-[10px] flex items-center px-2" style={{ background: 'rgba(255,255,255,0.05)', color: '#475569' }}>
-                      library.bisu-bilar.edu.ph
+
+                    {/* Back face — BISU University Seal (rotated 180° so it shows on the back) */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transform: 'rotateY(180deg)',
+                    }}>
+                      <img
+                        src="/bisu.png"
+                        alt="Bohol Island State University"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          filter: 'drop-shadow(0 0 28px rgba(124,58,237,0.65)) drop-shadow(0 4px 16px rgba(0,0,0,0.4))',
+                        }}
+                      />
                     </div>
                   </div>
+                </div>
 
-                  {/* Sidebar + Content layout */}
-                  <div className="flex h-64">
-                    {/* Mini sidebar */}
-                    <div className="w-14 py-3 flex flex-col items-center gap-2 border-r" style={{ background: '#0a0f1e', borderColor: 'rgba(255,255,255,0.04)' }}>
-                      {[FiBook, FiUsers, FiArrowRightCircle, FiCalendar, FiBarChart2].map((Icon, i) => (
-                        <div
-                          key={i}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center"
-                          style={i === 0
-                            ? { background: 'rgba(37,99,235,0.9)' }
-                            : { color: '#334155' }
-                          }
-                        >
-                          <Icon className={i === 0 ? 'text-white' : ''} size={14} />
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 p-4 overflow-hidden">
-                      <p className="font-bold text-xs mb-3" style={{ color: '#94a3b8' }}>Dashboard Overview</p>
-
-                      {/* Stat grid */}
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        {[
-                          { l: 'Total Books', v: '1,248', c: '#60a5fa', bg: 'rgba(59,130,246,0.1)' },
-                          { l: 'Active Loans', v: '87', c: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
-                          { l: 'Borrowers', v: '342', c: '#34d399', bg: 'rgba(52,211,153,0.1)' },
-                          { l: 'Overdue', v: '12', c: '#f87171', bg: 'rgba(248,113,113,0.1)' },
-                        ].map(({ l, v, c, bg }) => (
-                          <div key={l} className="rounded-lg p-2 border" style={{ background: bg, borderColor: 'rgba(255,255,255,0.04)' }}>
-                            <p className="text-sm font-bold" style={{ color: c }}>{v}</p>
-                            <p className="text-[10px]" style={{ color: '#475569' }}>{l}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Fake table */}
-                      <div className="rounded-lg overflow-hidden border" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                        <div className="grid grid-cols-3 gap-2 px-3 py-1.5" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                          {['Book', 'Borrower', 'Status'].map(h => (
-                            <span key={h} className="text-[10px] font-semibold uppercase" style={{ color: '#334155' }}>{h}</span>
-                          ))}
-                        </div>
-                        {[
-                          ['Intro to IT', 'J. Santos', 'Loaned', '#34d399'],
-                          ['Philippine Hist.', 'M. Reyes', 'Overdue', '#f87171'],
-                          ['Math Analysis', 'A. Cruz', 'Loaned', '#34d399'],
-                        ].map(([b, br, s, c]) => (
-                          <div key={b} className="grid grid-cols-3 gap-2 px-3 py-1.5 border-t" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
-                            <span className="text-[10px] truncate" style={{ color: '#94a3b8' }}>{b}</span>
-                            <span className="text-[10px]" style={{ color: '#64748b' }}>{br}</span>
-                            <span className="text-[10px] font-semibold" style={{ color: c }}>{s}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                {/* Label beneath */}
+                <div className="absolute -bottom-8 left-0 right-0 flex flex-col items-center gap-1">
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'rgba(148,163,184,0.7)', letterSpacing: '0.15em' }}>
+                    BISU Bilar Campus
+                  </p>
                 </div>
               </div>
             </div>
