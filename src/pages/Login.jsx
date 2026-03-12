@@ -370,180 +370,192 @@ export default function Login() {
 
       {/* Sign Up Modal */}
       {showSignup && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowSignup(false)}>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowSignup(false)}>
           <div 
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-100"
             onClick={(e) => e.stopPropagation()}
+            style={{ animation: 'modalSlideIn 0.25s ease-out' }}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <div>
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-5 flex items-center justify-between rounded-t-xl">
+              <div className="border-l-4 border-blue-500 pl-4">
                 <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
-                <p className="text-sm text-gray-500">Fill in your information to register</p>
+                <p className="text-sm text-gray-500 mt-0.5">Fill in your information to register</p>
               </div>
               <button 
                 onClick={() => setShowSignup(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-50 rounded-lg"
               >
                 <FiX size={20} />
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSignupSubmit} className="p-6 space-y-6">
-              {/* Account Info */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <FiShield size={14} className="text-blue-500" />
+            <form onSubmit={handleSignupSubmit} className="p-6 space-y-8">
+              {/* Account Info Section */}
+              <div className="border-l-4 border-blue-400 pl-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full border-2 border-blue-400 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  </div>
                   Account Information
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <label className="form-label">ID No / Student ID *</label>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1.5">ID No / Student ID <span className="text-red-400">*</span></label>
                     <input
                       type="text"
-                      className="form-input"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
                       placeholder="e.g., 2024-0001"
                       value={signupForm.id_no}
                       onChange={(e) => handleSignupChange('id_no', e.target.value)}
                       required
                     />
                   </div>
-                  <div>
-                    <label className="form-label">Password *</label>
-                    <div className="relative">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Password <span className="text-red-400">*</span></label>
+                      <div className="relative">
+                        <input
+                          type={showSignupPw ? 'text' : 'password'}
+                          className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
+                          placeholder="Min 6 characters"
+                          value={signupForm.password}
+                          onChange={(e) => handleSignupChange('password', e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          onClick={() => setShowSignupPw(!showSignupPw)}
+                        >
+                          {showSignupPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Confirm Password <span className="text-red-400">*</span></label>
                       <input
                         type={showSignupPw ? 'text' : 'password'}
-                        className="form-input pr-10"
-                        placeholder="Min 6 characters"
-                        value={signupForm.password}
-                        onChange={(e) => handleSignupChange('password', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
+                        placeholder="Repeat password"
+                        value={signupForm.confirm_password}
+                        onChange={(e) => handleSignupChange('confirm_password', e.target.value)}
                         required
                       />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowSignupPw(!showSignupPw)}
-                      >
-                        {showSignupPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                      </button>
                     </div>
-                  </div>
-                  <div>
-                    <label className="form-label">Confirm Password *</label>
-                    <input
-                      type={showSignupPw ? 'text' : 'password'}
-                      className="form-input"
-                      placeholder="Repeat password"
-                      value={signupForm.confirm_password}
-                      onChange={(e) => handleSignupChange('confirm_password', e.target.value)}
-                      required
-                    />
                   </div>
                 </div>
               </div>
 
-              {/* Personal Info */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <FiUsers size={14} className="text-green-500" />
+              {/* Personal Info Section */}
+              <div className="border-l-4 border-emerald-400 pl-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <FiUsers size={16} className="text-emerald-500" />
                   Personal Information
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="form-label">Firstname *</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Enter firstname"
-                      value={signupForm.firstname}
-                      onChange={(e) => handleSignupChange('firstname', e.target.value)}
-                      required
-                    />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Firstname <span className="text-red-400">*</span></label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Enter firstname"
+                        value={signupForm.firstname}
+                        onChange={(e) => handleSignupChange('firstname', e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Lastname <span className="text-red-400">*</span></label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Enter lastname"
+                        value={signupForm.lastname}
+                        onChange={(e) => handleSignupChange('lastname', e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Mobile Phone</label>
+                      <input
+                        type="tel"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="e.g., 09123456789"
+                        value={signupForm.mobile_phone}
+                        onChange={(e) => handleSignupChange('mobile_phone', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
+                      <input
+                        type="tel"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Landline (optional)"
+                        value={signupForm.phone}
+                        onChange={(e) => handleSignupChange('phone', e.target.value)}
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="form-label">Lastname *</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Enter lastname"
-                      value={signupForm.lastname}
-                      onChange={(e) => handleSignupChange('lastname', e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Mobile Phone</label>
-                    <input
-                      type="tel"
-                      className="form-input"
-                      placeholder="e.g., 09123456789"
-                      value={signupForm.mobile_phone}
-                      onChange={(e) => handleSignupChange('mobile_phone', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Phone</label>
-                    <input
-                      type="tel"
-                      className="form-input"
-                      placeholder="Landline (optional)"
-                      value={signupForm.phone}
-                      onChange={(e) => handleSignupChange('phone', e.target.value)}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="form-label">Email</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1.5">Email</label>
                     <input
                       type="email"
-                      className="form-input"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
                       placeholder="your.email@example.com"
                       value={signupForm.email}
                       onChange={(e) => handleSignupChange('email', e.target.value)}
                     />
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="form-label">Address</label>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1.5">Address</label>
                     <input
                       type="text"
-                      className="form-input"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
                       placeholder="Complete address"
                       value={signupForm.address}
                       onChange={(e) => handleSignupChange('address', e.target.value)}
                     />
                   </div>
-                  <div>
-                    <label className="form-label">Type</label>
-                    <select
-                      className="form-input"
-                      value={signupForm.type}
-                      onChange={(e) => handleSignupChange('type', e.target.value)}
-                    >
-                      <option value="STUDENT">Student</option>
-                      <option value="FACULTY">Faculty</option>
-                      <option value="STAFF">Staff</option>
-                      <option value="OTHERS">Others</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="form-label">Notes</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Additional notes (optional)"
-                      value={signupForm.notes}
-                      onChange={(e) => handleSignupChange('notes', e.target.value)}
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Type</label>
+                      <select
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50 appearance-none cursor-pointer"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+                        value={signupForm.type}
+                        onChange={(e) => handleSignupChange('type', e.target.value)}
+                      >
+                        <option value="STUDENT">Student</option>
+                        <option value="FACULTY">Faculty</option>
+                        <option value="STAFF">Staff</option>
+                        <option value="OTHERS">Others</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Notes</label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Additional notes (optional)"
+                        value={signupForm.notes}
+                        onChange={(e) => handleSignupChange('notes', e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Submit */}
-              <div className="flex gap-3 pt-4 border-t">
+              <div className="flex gap-3 pt-5 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setShowSignup(false)}
-                  className="flex-1 btn btn-secondary py-3"
+                  className="flex-1 py-3 px-6 text-gray-600 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-all"
                 >
                   Cancel
                 </button>
@@ -586,6 +598,10 @@ export default function Login() {
         @keyframes shimmer {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
+        }
+        @keyframes modalSlideIn {
+          from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>
