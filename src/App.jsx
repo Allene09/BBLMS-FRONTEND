@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
+import LoadingScreen from './components/LoadingScreen';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -14,15 +15,15 @@ import Users from './pages/Users';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return (
-    <div className="flex items-center justify-center h-screen bg-slate-50">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-gray-400 font-medium">Loading...</p>
-      </div>
-    </div>
-  );
+  if (loading) return <LoadingScreen message="Verifying your session..." />;
   return user ? children : <Navigate to="/login" />;
+}
+
+function TransitionOverlay() {
+  const { transitioning, transitionVariant } = useAuth();
+  if (!transitioning) return null;
+  const messages = { login: 'Welcome back!', logout: 'Signing you out...' };
+  return <LoadingScreen variant={transitionVariant} message={messages[transitionVariant]} />;
 }
 
 // Only allow users whose access_right is in the allowed list
@@ -35,6 +36,8 @@ function RoleRoute({ children, roles }) {
 
 export default function App() {
   return (
+    <>
+    <TransitionOverlay />
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
@@ -50,6 +53,7 @@ export default function App() {
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+    </>
   );
 }
 

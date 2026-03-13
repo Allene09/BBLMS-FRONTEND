@@ -30,11 +30,12 @@ const roleColors = {
 };
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, showTransition } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await showTransition('logout', 3000);
     logout();
     navigate('/login');
   };

@@ -39,7 +39,7 @@ const FloatingParticles = () => (
 );
 
 export default function Login() {
-  const { user, login } = useAuth();
+  const { user, login, showTransition } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [userId, setUserId] = useState('');
@@ -80,7 +80,9 @@ export default function Login() {
       const data = await login(userId, password);
       toast.success('Welcome back!');
       const role = data.user?.access_right;
-      navigate(['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books');
+      const dest = ['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books';
+      await showTransition('login', 3000);
+      navigate(dest);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Invalid credentials');
     } finally {
@@ -257,7 +259,7 @@ export default function Login() {
           {/* Welcome section */}
           <div className="mb-8">
             <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Welcome back</h1>
-            <p className="text-gray-500 text-base">Sign in to access the library portal.</p>
+            <p className="text-gray-500 text-base">Sign in to access the library management system.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

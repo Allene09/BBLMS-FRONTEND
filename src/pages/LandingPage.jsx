@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import {
   PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiCalendarCheck as FiCalendar,
@@ -104,8 +105,16 @@ function useInView(threshold = 0.12) {
 }
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+  const { showTransition } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const handleGoToLogin = async (state) => {
+    setMenuOpen(false);
+    await showTransition('login', 3000);
+    navigate('/login', state ? { state } : undefined);
+  };
   const [featRef,  featVisible]  = useInView();
   const [statsRef, statsVisible] = useInView();
   const [stepsRef, stepsVisible] = useInView();
@@ -164,21 +173,20 @@ export default function LandingPage() {
 
             {/* CTAs */}
             <div className="hidden md:flex items-center gap-3">
-              <Link
-                to="/login"
-                state={{ showSignup: true }}
+              <button
+                onClick={() => handleGoToLogin({ showSignup: true })}
                 className={`text-sm font-semibold px-4 py-2 rounded-lg transition-colors ${
                   scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'
                 }`}
               >
                 Sign Up
-              </Link>
-              <Link
-                to="/login"
+              </button>
+              <button
+                onClick={() => handleGoToLogin()}
                 className="text-sm font-bold px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-px"
               >
                 Sign In →
-              </Link>
+              </button>
             </div>
 
             {/* Mobile toggle */}
@@ -205,13 +213,12 @@ export default function LandingPage() {
               </a>
             ))}
             <div className="pt-2 border-t border-gray-100 mt-2">
-              <Link
-                to="/login"
-                className="block text-center text-sm font-bold px-4 py-3 rounded-xl bg-blue-600 text-white mt-2"
-                onClick={() => setMenuOpen(false)}
+              <button
+                onClick={() => handleGoToLogin()}
+                className="w-full text-center text-sm font-bold px-4 py-3 rounded-xl bg-blue-600 text-white mt-2"
               >
                 Sign In to Portal
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -267,8 +274,8 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-wrap gap-4 mb-12 anim-fade-up d-300">
-                <Link
-                  to="/login"
+                <button
+                  onClick={() => handleGoToLogin()}
                   className="inline-flex items-center gap-2 px-7 py-3.5 font-bold text-white rounded-xl transition-all hover:-translate-y-1"
                   style={{
                     background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
@@ -276,7 +283,7 @@ export default function LandingPage() {
                   }}
                 >
                   Get Started <FiArrowRight size={18} />
-                </Link>
+                </button>
                 <a
                   href="#features"
                   className="inline-flex items-center gap-2 px-7 py-3.5 font-bold rounded-xl border transition-all hover:-translate-y-1"
@@ -584,12 +591,12 @@ export default function LandingPage() {
           <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
             Access the BISU Bilar Library Management System portal and experience the difference digital management makes for students and staff alike.
           </p>
-          <Link
-            to="/login"
+          <button
+            onClick={() => handleGoToLogin()}
             className="inline-flex items-center gap-2 px-9 py-4 bg-white text-blue-700 font-extrabold rounded-2xl hover:bg-blue-50 transition-all hover:-translate-y-1 shadow-2xl shadow-blue-900/30 text-base"
           >
             Access the Portal <FiArrowRight size={18} />
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -626,7 +633,7 @@ export default function LandingPage() {
                   { href: '/login', label: 'Staff Portal', isLink: true },
                 ].map(({ href, label, isLink }) =>
                   isLink ? (
-                    <Link key={label} to={href} className="block text-sm hover:text-white transition">{label}</Link>
+                    <button key={label} onClick={() => handleGoToLogin()} className="block text-sm hover:text-white transition">{label}</button>
                   ) : (
                     <a key={label} href={href} className="block text-sm hover:text-white transition">{label}</a>
                   )

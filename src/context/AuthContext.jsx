@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
@@ -6,6 +6,20 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [transitioning, setTransitioning] = useState(false);
+  const [transitionVariant, setTransitionVariant] = useState('loading');
+
+  // Show the full-screen transition animation for `ms` milliseconds
+  const showTransition = useCallback((variant, ms = 3000) => {
+    return new Promise((resolve) => {
+      setTransitionVariant(variant);
+      setTransitioning(true);
+      setTimeout(() => {
+        setTransitioning(false);
+        resolve();
+      }, ms);
+    });
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -45,7 +59,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, transitioning, transitionVariant, showTransition }}>
       {children}
     </AuthContext.Provider>
   );
