@@ -619,7 +619,7 @@ export default function LandingPage() {
                   className="w-10 h-10 object-contain"
                 />
                 <div>
-                  <p className="text-white font-extrabold text-sm">BISU — BILAR LMS</p>
+                  <p className="text-white font-extrabold text-sm">BISU BILAR LMS</p>
                   <p className="text-xs" style={{ color: '#94a3b8' }}>Library Management System</p>
                 </div>
               </div>
