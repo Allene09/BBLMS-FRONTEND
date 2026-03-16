@@ -91,17 +91,23 @@ const steps = [
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      ([e]) => {
+        const isVisible = e.isIntersecting;
+        setVisible(isVisible);
+        if (isVisible) setHasEntered(true);
+      },
       { threshold }
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
-  return [ref, visible];
+  return [ref, visible, hasEntered];
 }
 
 export default function LandingPage() {
@@ -115,11 +121,11 @@ export default function LandingPage() {
     await showTransition('login', 3000);
     navigate('/login', state ? { state } : undefined);
   };
-  const [featRef,  featVisible]  = useInView();
-  const [statsRef, statsVisible] = useInView();
-  const [stepsRef, stepsVisible] = useInView();
-  const [aboutRef, aboutVisible] = useInView();
-  const [ctaRef,   ctaVisible]   = useInView();
+  const [featRef,  featVisible,  featEntered]  = useInView();
+  const [statsRef, statsVisible, statsEntered] = useInView();
+  const [stepsRef, stepsVisible, stepsEntered] = useInView();
+  const [aboutRef, aboutVisible, aboutEntered] = useInView();
+  const [ctaRef,   ctaVisible,   ctaEntered]   = useInView();
   const [liveStats, setLiveStats] = useState(null);
 
   useEffect(() => {
@@ -422,7 +428,7 @@ export default function LandingPage() {
       {/* ── Features ── */}
       <section id="features" className="py-24 bg-white" ref={featRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`text-center mb-16 ${featVisible ? 'anim-fade-up' : 'opacity-0'}`}>
+          <div className={`text-center mb-16 ${featVisible ? 'anim-fade-up' : featEntered ? 'opacity-100' : 'opacity-0'}`}>
             <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
               Features
             </span>
@@ -437,7 +443,7 @@ export default function LandingPage() {
               <div
                 key={f.title}
                 style={{ animationDelay: `${fi * 0.1}s` }}
-                className={`group p-7 rounded-2xl border ${f.border} hover:shadow-xl transition-all duration-300 cursor-default bg-white hover:-translate-y-1 ${featVisible ? 'anim-fade-up' : 'opacity-0'}`}
+                className={`group p-7 rounded-2xl border ${f.border} hover:shadow-xl transition-all duration-300 cursor-default bg-white hover:-translate-y-1 ${featVisible ? 'anim-fade-up' : featEntered ? 'opacity-100' : 'opacity-0'}`}
               >
                 <div className={`w-12 h-12 ${f.bg} ${f.border} border rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                   <f.icon className={f.color} size={22} />
@@ -461,7 +467,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((s, si) => (
-              <div key={s.label} style={{ animationDelay: `${si * 0.15}s` }} className={`text-center group ${statsVisible ? 'anim-scale-in' : 'opacity-0'}`}>
+              <div key={s.label} style={{ animationDelay: `${si * 0.15}s` }} className={`text-center group ${statsVisible ? 'anim-scale-in' : statsEntered ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center border transition-colors group-hover:bg-blue-600/20"
                   style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
                   <s.icon style={{ color: '#60a5fa' }} size={20} />
@@ -479,7 +485,7 @@ export default function LandingPage() {
       {/* ── How It Works ── */}
       <section id="how-it-works" className="py-24 bg-gray-50" ref={stepsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`text-center mb-16 ${stepsVisible ? 'anim-fade-up' : 'opacity-0'}`}>
+          <div className={`text-center mb-16 ${stepsVisible ? 'anim-fade-up' : stepsEntered ? 'opacity-100' : 'opacity-0'}`}>
             <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
               How It Works
             </span>
@@ -494,7 +500,7 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-16 left-[33%] right-[33%] h-px border-t-2 border-dashed border-blue-200" />
 
             {steps.map((s, i) => (
-              <div key={s.step} style={{ animationDelay: `${i * 0.15 + 0.1}s` }} className={`relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all ${stepsVisible ? 'anim-fade-up' : 'opacity-0'}`}>
+              <div key={s.step} style={{ animationDelay: `${i * 0.15 + 0.1}s` }} className={`relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all ${stepsVisible ? 'anim-fade-up' : stepsEntered ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shadow-sm"
                     style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)', color: '#fff' }}>
@@ -516,7 +522,7 @@ export default function LandingPage() {
       <section id="about" className="py-24 bg-white" ref={aboutRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className={aboutVisible ? 'anim-fade-left' : 'opacity-0'}>
+            <div className={aboutVisible ? 'anim-fade-left' : aboutEntered ? 'opacity-100' : 'opacity-0'}>
               <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
                 About
               </span>
@@ -547,7 +553,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className={`rounded-3xl p-10 border border-blue-100 ${aboutVisible ? 'anim-fade-right d-200' : 'opacity-0'}`} style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
+            <div className={`rounded-3xl p-10 border border-blue-100 ${aboutVisible ? 'anim-fade-right d-200' : aboutEntered ? 'opacity-100' : 'opacity-0'}`} style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
               <div className="space-y-6">
                 {[
                   { icon: FiDatabase, title: 'Centralized Database', desc: 'All library data in one secure SQLite database with full backup capability and zero reliance on external servers.' },
@@ -579,7 +585,7 @@ export default function LandingPage() {
           backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
                             radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)`
         }} />
-        <div className={`max-w-4xl mx-auto px-4 text-center relative ${ctaVisible ? 'anim-scale-in' : 'opacity-0'}`}>
+        <div className={`max-w-4xl mx-auto px-4 text-center relative ${ctaVisible ? 'anim-scale-in' : ctaEntered ? 'opacity-100' : 'opacity-0'}`}>
           <img
             src="/logo.png"
             alt="BISU Bilar Library Logo"
