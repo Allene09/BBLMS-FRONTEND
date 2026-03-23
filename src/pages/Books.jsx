@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX, PiBookOpen as FiBookOpen, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft } from 'react-icons/pi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX, PiCheck as FiCheck, PiListBullets as FiList, PiCalendarCheck as FiCalendar } from 'react-icons/pi';
 
 const emptyBook = {
   title: '', author: '', co_author: '', type: 'Book', publisher: '', place: '',
@@ -14,8 +15,13 @@ const emptyBook = {
 };
 
 export default function Books() {
-  const { user } = useAuth();
-  const canEdit = ['ADMIN', 'LIBRARIAN'].includes(user?.access_right);
+  const { user, transitioning } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const canManageBooks = ['LIBRARIAN'].includes(user?.access_right);
+  const canAddBooks = ['LIBRARIAN', 'STAFF'].includes(user?.access_right);
+  const canIncrementCopies = user?.access_right === 'STAFF';
+  const canSelfReserve = !canManageBooks;
   const [books, setBooks] = useState([]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
@@ -23,16 +29,23 @@ export default function Books() {
   const [form, setForm] = useState({ ...emptyBook });
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [addingCopyId, setAddingCopyId] = useState(null);
 
   // Borrow states
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [borrowLoading, setBorrowLoading] = useState(false);
   const [myLoans, setMyLoans] = useState([]);
+  const [myReservations, setMyReservations] = useState([]);
+  const [showReserveModal, setShowReserveModal] = useState(false);
+  const [reserveLoading, setReserveLoading] = useState(false);
+  const [reservedForDays, setReservedForDays] = useState(5);
+  const [reserveNotes, setReserveNotes] = useState('');
 
   // Return states
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [returnLoading, setReturnLoading] = useState(false);
+  const [autoBorrowHandled, setAutoBorrowHandled] = useState(false);
 
   const fetchBooks = async () => {
     try {
@@ -52,9 +65,19 @@ export default function Books() {
     }
   };
 
+  const fetchMyReservations = async () => {
+    try {
+      const res = await api.get('/reservations/mine');
+      setMyReservations(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      // Silently fail - reservation list is secondary in this page
+    }
+  };
+
   useEffect(() => { 
     fetchBooks(); 
     fetchMyLoans();
+    fetchMyReservations();
   }, []);
 
   // Set default due date (3 days from now)
@@ -65,6 +88,48 @@ export default function Books() {
       setDueDate(due.toISOString().split('T')[0]);
     }
   }, [showBorrowModal]);
+
+  useEffect(() => {
+    if (autoBorrowHandled) return;
+    if (transitioning) return;
+
+    const borrowBookId = location.state?.borrowBookId;
+    const autoBorrow = location.state?.autoBorrow;
+
+    if (!borrowBookId || !autoBorrow || books.length === 0) return;
+
+    const targetBook = books.find((b) => String(b.id) === String(borrowBookId));
+    if (!targetBook) {
+      toast.error('Selected book is not available in the current list.');
+      setAutoBorrowHandled(true);
+      navigate('/app/books', { replace: true });
+      return;
+    }
+
+    setSelected(targetBook);
+
+    if (targetBook.copies_available <= 0) {
+      toast.error('Selected book has no available copies.');
+      setAutoBorrowHandled(true);
+      navigate('/app/books', { replace: true });
+      return;
+    }
+
+    if (targetBook.circulation_type === 'Reference' || targetBook.circulation_type === 'Room-Use Only') {
+      toast.error('Selected book is not available for borrowing.');
+      setAutoBorrowHandled(true);
+      navigate('/app/books', { replace: true });
+      return;
+    }
+
+    const openTimer = setTimeout(() => {
+      setShowBorrowModal(true);
+      setAutoBorrowHandled(true);
+      navigate('/app/books', { replace: true });
+    }, 150);
+
+    return () => clearTimeout(openTimer);
+  }, [autoBorrowHandled, books, location.state, navigate, transitioning]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -122,6 +187,26 @@ export default function Books() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleAddCopy = async (book) => {
+    setAddingCopyId(book.id);
+    try {
+      const updatedCopies = Number(book.copies_available || 0) + 1;
+      const payload = { ...book, copies_available: updatedCopies };
+      const res = await api.put(`/books/${book.id}`, payload);
+      const updated = res.data;
+
+      setBooks((prev) => prev.map((b) => (b.id === book.id ? { ...b, ...updated } : b)));
+      if (selected?.id === book.id) {
+        setSelected((prev) => ({ ...prev, ...updated }));
+      }
+      toast.success(`Copies updated to ${updated.copies_available}`);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to add copy');
+    } finally {
+      setAddingCopyId(null);
+    }
+  };
+
   // Borrow handlers
   const handleBorrowClick = () => {
     if (!selected) return toast.error('Select a book first');
@@ -147,10 +232,41 @@ export default function Books() {
       setSelected(null);
       fetchBooks();
       fetchMyLoans();
+      fetchMyReservations();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Borrow failed');
     } finally {
       setBorrowLoading(false);
+    }
+  };
+
+  const handleReserveClick = () => {
+    if (!selected) return toast.error('Select a book first');
+    if (selected.circulation_type === 'Reference' || selected.circulation_type === 'Room-Use Only') {
+      return toast.error('This item is not available for reservation');
+    }
+    setReservedForDays(5);
+    setReserveNotes('');
+    setShowReserveModal(true);
+  };
+
+  const handleReserveSubmit = async () => {
+    if (!selected) return;
+
+    setReserveLoading(true);
+    try {
+      await api.post('/reservations/self', {
+        book_id: selected.id,
+        reserved_for_days: reservedForDays,
+        notes: reserveNotes,
+      });
+      toast.success(`Reservation created for "${selected.title}"`);
+      setShowReserveModal(false);
+      fetchMyReservations();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Reservation failed');
+    } finally {
+      setReserveLoading(false);
     }
   };
 
@@ -182,15 +298,9 @@ export default function Books() {
       {/* Toolbar */}
       <div className="card mb-4">
         <div className="flex flex-wrap items-center gap-3">
-          {canEdit && <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> New</button>}
-          {canEdit && <button className="btn btn-warning" onClick={handleEdit}><FiEdit2 size={16} /> Edit</button>}
-          {canEdit && <button className="btn btn-danger" onClick={handleDelete}><FiTrash2 size={16} /> Delete</button>}
-          <button className="btn btn-success" onClick={handleBorrowClick}>
-            <FiBookOpen size={16} /> Borrow
-          </button>
-          <button className="btn btn-info" onClick={() => { fetchMyLoans(); setShowReturnModal(true); }}>
-            <FiCornerDownLeft size={16} /> Return
-          </button>
+          {canAddBooks && <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> New</button>}
+          {canManageBooks && <button className="btn btn-warning" onClick={handleEdit}><FiEdit2 size={16} /> Edit</button>}
+          {canManageBooks && <button className="btn btn-danger" onClick={handleDelete}><FiTrash2 size={16} /> Delete</button>}
           <button className="btn btn-secondary" onClick={fetchBooks}><FiRefreshCw size={16} /> Refresh</button>
 
           <form onSubmit={handleSearch} className="flex items-center gap-2 ml-auto">
@@ -223,11 +333,12 @@ export default function Books() {
                   <th>Type</th>
                   <th>Barcode</th>
                   <th>Copies</th>
+                  <th className="text-center">+</th>
                 </tr>
               </thead>
               <tbody>
                 {books.length === 0 ? (
-                  <tr><td colSpan={5} className="text-center text-gray-500 py-8">No books found</td></tr>
+                  <tr><td colSpan={6} className="text-center text-gray-500 py-8">No books found</td></tr>
                 ) : books.map((book) => (
                   <tr
                     key={book.id}
@@ -239,6 +350,22 @@ export default function Books() {
                     <td>{book.type}</td>
                     <td className="font-mono text-xs">{book.barcode || '-'}</td>
                     <td className="text-center">{book.copies_available}</td>
+                    <td className="text-center">
+                      {canIncrementCopies && (
+                        <button
+                          type="button"
+                          className="btn btn-primary text-xs py-1 px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddCopy(book);
+                          }}
+                          title="Add copy"
+                          disabled={addingCopyId === book.id}
+                        >
+                          <FiPlus size={12} />
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -278,15 +405,6 @@ export default function Books() {
                 </div>
               ))}
               
-              {/* Quick borrow button in details */}
-              {selected.copies_available > 0 && selected.circulation_type === 'Loanable' && (
-                <button 
-                  className="btn btn-success w-full mt-4"
-                  onClick={handleBorrowClick}
-                >
-                  <FiBookOpen size={16} /> Borrow This Book
-                </button>
-              )}
             </div>
           ) : (
             <p className="text-gray-400 text-sm">Select a book to view details</p>
@@ -460,6 +578,85 @@ export default function Books() {
                 disabled={borrowLoading}
               >
                 <FiCheck size={16} /> {borrowLoading ? 'Processing...' : 'Confirm Borrow'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reserve Modal */}
+      {showReserveModal && selected && (
+        <div className="modal-overlay" onClick={() => setShowReserveModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-800">Reserve Book</h2>
+              <button onClick={() => setShowReserveModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-xs text-blue-600 font-semibold mb-1">Selected Book</p>
+                <p className="text-base font-bold text-blue-900">{selected.title}</p>
+                <p className="text-sm text-blue-700">{selected.author}</p>
+                <div className="flex gap-4 mt-2 text-xs text-blue-600">
+                  <span>Barcode: {selected.barcode || 'N/A'}</span>
+                  <span>Available: {selected.copies_available}</span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                <p className="text-xs text-gray-500 font-semibold mb-1">Reserved By</p>
+                <p className="text-base font-bold text-gray-800">{user?.username}</p>
+                <p className="text-sm text-gray-600">ID: {user?.user_id}</p>
+              </div>
+
+              <div>
+                <label className="form-label">Reserved For (days)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  className="form-input"
+                  value={reservedForDays}
+                  onChange={(e) => setReservedForDays(parseInt(e.target.value, 10) || 5)}
+                />
+                <p className="text-xs text-gray-400 mt-1">Default reservation period: 5 days</p>
+              </div>
+
+              <div>
+                <label className="form-label">Notes</label>
+                <textarea
+                  className="form-input"
+                  rows={3}
+                  value={reserveNotes}
+                  onChange={(e) => setReserveNotes(e.target.value)}
+                  placeholder="Optional note for your reservation"
+                />
+              </div>
+
+              {myReservations.filter((item) => item.status === 'Active').length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
+                    <FiList size={12} /> Your Active Reservations ({myReservations.filter((item) => item.status === 'Active').length})
+                  </p>
+                  <div className="max-h-32 overflow-y-auto border rounded-lg">
+                    {myReservations.filter((item) => item.status === 'Active').map((reservation) => (
+                      <div key={reservation.id} className="px-3 py-2 border-b last:border-b-0 text-sm flex justify-between items-center gap-3">
+                        <span className="truncate max-w-[220px]">{reservation.book_title}</span>
+                        <span className="badge badge-active text-xs">{reservation.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="btn btn-primary w-full py-3"
+                onClick={handleReserveSubmit}
+                disabled={reserveLoading}
+              >
+                <FiCalendar size={16} /> {reserveLoading ? 'Saving...' : 'Confirm Reservation'}
               </button>
             </div>
           </div>

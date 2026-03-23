@@ -10,6 +10,9 @@ import Borrowers from './pages/Borrowers';
 import Suppliers from './pages/Suppliers';
 import Checkout from './pages/Checkout';
 import Checkin from './pages/Checkin';
+import OverdueMonitoring from './pages/OverdueMonitoring';
+import BorrowRecords from './pages/BorrowRecords';
+import Reports from './pages/Reports';
 import Reservations from './pages/Reservations';
 import Users from './pages/Users';
 
@@ -29,12 +32,26 @@ function TransitionOverlay() {
 // Only allow users whose access_right is in the allowed list
 function RoleRoute({ children, roles }) {
   const { user } = useAuth();
+
+  const defaultRouteByRole = {
+    CIRCULATION_IN_CHARGE: '/app/checkout',
+    STAFF: '/app/books',
+  };
+
   if (!user) return <Navigate to="/login" />;
-  if (!roles.includes(user.access_right)) return <Navigate to="/app/books" />;
+  if (!roles.includes(user.access_right)) {
+    return <Navigate to={defaultRouteByRole[user.access_right] || '/app'} />;
+  }
   return children;
 }
 
 export default function App() {
+  const adminRoles = ['ADMIN', 'ADMINISTRATOR'];
+  const adminLibrarianRoles = [...adminRoles, 'LIBRARIAN'];
+  const circulationRoles = ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'];
+  const inventoryRoles = [...adminRoles, 'LIBRARIAN', 'STAFF'];
+  const librarianOnlyRoles = ['LIBRARIAN'];
+
   return (
     <>
     <TransitionOverlay />
@@ -42,14 +59,17 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/app" element={<PrivateRoute><Layout /></PrivateRoute>}>
-        <Route index element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Dashboard /></RoleRoute>} />
-        <Route path="books" element={<Books />} />
-        <Route path="borrowers" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Borrowers /></RoleRoute>} />
-        <Route path="suppliers" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Suppliers /></RoleRoute>} />
-        <Route path="checkout" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Checkout /></RoleRoute>} />
-        <Route path="checkin" element={<RoleRoute roles={['ADMIN','LIBRARIAN']}><Checkin /></RoleRoute>} />
-        <Route path="reservations" element={<RoleRoute roles={['ADMIN','LIBRARIAN','FACULTY']}><Reservations /></RoleRoute>} />
-        <Route path="users" element={<RoleRoute roles={['ADMIN']}><Users /></RoleRoute>} />
+        <Route index element={<RoleRoute roles={adminLibrarianRoles}><Dashboard /></RoleRoute>} />
+        <Route path="books" element={<RoleRoute roles={inventoryRoles}><Books /></RoleRoute>} />
+        <Route path="borrowers" element={<RoleRoute roles={librarianOnlyRoles}><Borrowers /></RoleRoute>} />
+        <Route path="suppliers" element={<RoleRoute roles={['STAFF']}><Suppliers /></RoleRoute>} />
+        <Route path="checkout" element={<RoleRoute roles={circulationRoles}><Checkout /></RoleRoute>} />
+        <Route path="checkin" element={<RoleRoute roles={circulationRoles}><Checkin /></RoleRoute>} />
+        <Route path="overdue" element={<RoleRoute roles={circulationRoles}><OverdueMonitoring /></RoleRoute>} />
+        <Route path="records" element={<RoleRoute roles={circulationRoles}><BorrowRecords /></RoleRoute>} />
+        <Route path="reports" element={<RoleRoute roles={adminLibrarianRoles}><Reports /></RoleRoute>} />
+        <Route path="reservations" element={<RoleRoute roles={librarianOnlyRoles}><Reservations /></RoleRoute>} />
+        <Route path="users" element={<RoleRoute roles={adminRoles}><Users /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

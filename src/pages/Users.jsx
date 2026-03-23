@@ -5,7 +5,7 @@ import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiX a
 
 const emptyUser = {
   user_id: '', username: '', password: '', designation: '',
-  access_right: 'USER', is_admin: false,
+  access_right: 'STAFF', is_admin: false,
 };
 
 export default function Users() {
@@ -271,9 +271,10 @@ export default function Users() {
                 <div>
                   <label className="form-label">Access Right</label>
                   <select className="form-input" value={form.access_right} onChange={(e) => handleChange('access_right', e.target.value)}>
-                    <option>USER</option>
-                    <option>ADMINISTRATOR</option>
+                    <option>STAFF</option>
                     <option>LIBRARIAN</option>
+                    <option>CIRCULATION_IN_CHARGE</option>
+                    <option>ADMIN</option>
                   </select>
                 </div>
                 <div className="flex items-end">

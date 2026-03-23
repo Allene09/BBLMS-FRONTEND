@@ -7,6 +7,7 @@ import {
   PiChartBar as FiBarChart2, PiShieldCheck as FiShield, PiList as FiMenu, PiX as FiX, PiCheck as FiCheck,
   PiArrowRight as FiArrowRight, PiEnvelopeSimple as FiMail, PiPhone as FiPhone, PiMapPin as FiMapPin, PiClock as FiClock,
   PiTrendUp as FiTrendingUp, PiDatabase as FiDatabase, PiGlobe as FiGlobe, PiStar as FiStar,
+  PiMagnifyingGlass as FiSearch,
 } from 'react-icons/pi';
 
 const features = [
@@ -109,11 +110,22 @@ export default function LandingPage() {
   const { showTransition } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [bookQuery, setBookQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [availableCategories, setAvailableCategories] = useState([]);
+  const [searchedBooks, setSearchedBooks] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchTouched, setSearchTouched] = useState(false);
 
   const handleGoToLogin = async (state) => {
     setMenuOpen(false);
     await showTransition('login', 3000);
     navigate('/login', state ? { state } : undefined);
+  };
+
+  const handleViewDetails = (book) => {
+    setSelectedBook(book);
   };
   const [featRef,  featVisible]  = useInView();
   const [statsRef, statsVisible] = useInView();
@@ -125,6 +137,42 @@ export default function LandingPage() {
   useEffect(() => {
     api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    api.get('/books/public-categories')
+      .then((res) => setAvailableCategories(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setAvailableCategories([]));
+  }, []);
+
+  useEffect(() => {
+    const query = bookQuery.trim();
+    if (!query) {
+      setSearchedBooks([]);
+      return;
+    }
+
+    if (query.length < 2) {
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const params = { q: query };
+        if (selectedCategory !== 'all') {
+          params.category = selectedCategory;
+        }
+        const res = await api.get('/books/public-search', { params });
+        setSearchedBooks(Array.isArray(res.data) ? res.data : []);
+      } catch {
+        setSearchedBooks([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [bookQuery, selectedCategory]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -156,8 +204,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Desktop links */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Desktop links + compact search */}
+            <div className="hidden md:flex items-center gap-6">
               {['#', '#features', '#how-it-works', '#about'].map((href, i) => (
                 <a
                   key={href}
@@ -169,18 +217,94 @@ export default function LandingPage() {
                   {['Home', 'Features', 'How It Works', 'About'][i]}
                 </a>
               ))}
+
+              <div className="relative w-[380px]">
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setSearchTouched(true);
+                    }}
+                    className={`w-36 rounded-lg border px-2.5 py-2 text-xs outline-none transition ${
+                      scrolled ? 'bg-white text-gray-700 border-gray-200' : 'bg-white/10 text-blue-100 border-white/20'
+                    }`}
+                  >
+                    <option value="all">All Categories</option>
+                    {availableCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="relative flex-1">
+                    <FiSearch
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${
+                        scrolled ? 'text-gray-400' : 'text-blue-200'
+                      }`}
+                      size={14}
+                    />
+                    <input
+                      type="text"
+                      value={bookQuery}
+                      onChange={(e) => {
+                        setBookQuery(e.target.value);
+                        setSearchTouched(true);
+                      }}
+                      placeholder="Search books"
+                      className={`w-full rounded-lg border pl-9 pr-3 py-2 text-xs outline-none transition ${
+                        scrolled ? 'bg-white text-gray-800 border-gray-200' : 'bg-white/10 text-white border-white/20'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {!searchLoading && bookQuery.trim().length >= 2 && searchedBooks.length > 0 && (
+                  <div className="absolute top-[110%] left-0 right-0 rounded-xl border shadow-xl max-h-64 overflow-y-auto z-50"
+                    style={{
+                      background: scrolled ? '#ffffff' : 'rgba(15, 23, 42, 0.96)',
+                      borderColor: scrolled ? '#e5e7eb' : 'rgba(147, 197, 253, 0.25)',
+                    }}
+                  >
+                    {searchedBooks.map((book) => (
+                      <div key={book.id} className="p-3 border-b last:border-b-0"
+                        style={{ borderColor: scrolled ? '#f1f5f9' : 'rgba(147, 197, 253, 0.15)' }}>
+                        <p className={`text-xs font-semibold ${scrolled ? 'text-gray-900' : 'text-white'}`}>{book.title}</p>
+                        <p className={`text-[11px] mt-0.5 ${scrolled ? 'text-gray-500' : 'text-blue-200'}`}>{book.author || 'Unknown author'}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          <button
+                            onClick={() => handleViewDetails(book)}
+                            className={`px-2.5 py-1.5 text-[10px] rounded border font-semibold transition ${
+                              scrolled
+                                ? 'text-blue-700 border-blue-200 bg-blue-50 hover:bg-blue-100'
+                                : 'text-blue-100 border-blue-300/50 bg-blue-500/20 hover:bg-blue-500/30'
+                            }`}
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!searchLoading && searchTouched && bookQuery.trim().length >= 2 && searchedBooks.length === 0 && (
+                  <p className={`absolute top-[110%] left-0 text-[11px] ${scrolled ? 'text-gray-500' : 'text-blue-200'}`}>
+                    No books found for your search.
+                  </p>
+                )}
+
+                {searchLoading && (
+                  <p className={`absolute top-[110%] left-0 text-[11px] ${scrolled ? 'text-gray-500' : 'text-blue-200'}`}>
+                    Searching...
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* CTAs */}
             <div className="hidden md:flex items-center gap-3">
-              <button
-                onClick={() => handleGoToLogin({ showSignup: true })}
-                className={`text-sm font-semibold px-4 py-2 rounded-lg transition-colors ${
-                  scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'
-                }`}
-              >
-                Sign Up
-              </button>
               <button
                 onClick={() => handleGoToLogin()}
                 className="text-sm font-bold px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-px"
@@ -665,6 +789,44 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {selectedBook && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div className="flex items-start justify-between px-5 py-4 border-b border-slate-100">
+              <div>
+                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Book Details</p>
+                <h3 className="text-lg font-bold text-slate-900 leading-snug">{selectedBook.title}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedBook(null)}
+                className="text-slate-500 hover:text-slate-700"
+                aria-label="Close book details"
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+            <div className="px-5 py-4 space-y-2 text-sm text-slate-700">
+              <p><span className="font-semibold text-slate-900">Author:</span> {selectedBook.author || 'Unknown author'}</p>
+              <p><span className="font-semibold text-slate-900">Accession No:</span> {selectedBook.accession_no || 'N/A'}</p>
+              <p><span className="font-semibold text-slate-900">Location:</span> {selectedBook.location || 'Not specified'}</p>
+              <p><span className="font-semibold text-slate-900">Circulation:</span> {selectedBook.circulation_type || 'Not specified'}</p>
+              <p><span className="font-semibold text-slate-900">Category:</span> {selectedBook.category || 'Not specified'}</p>
+              <p><span className="font-semibold text-slate-900">Type:</span> {selectedBook.type || 'Not specified'}</p>
+              <p><span className="font-semibold text-slate-900">Call Number:</span> {selectedBook.call_no || 'N/A'}</p>
+              <p><span className="font-semibold text-slate-900">Available Copies:</span> {selectedBook.copies_available ?? 0}</p>
+            </div>
+            <div className="px-5 py-4 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setSelectedBook(null)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

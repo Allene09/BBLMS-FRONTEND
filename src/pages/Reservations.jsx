@@ -3,6 +3,11 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import { PiMagnifyingGlass as FiSearch, PiCalendarCheck as FiCalendar, PiX as FiX, PiCheck as FiCheck } from 'react-icons/pi';
 
+const getReservationStatusLabel = (status) => {
+  if (status === 'Fulfilled') return 'Completed';
+  return status;
+};
+
 export default function Reservations() {
   const [reservations, setReservations] = useState([]);
   const [bookBarcode, setBookBarcode] = useState('');
@@ -68,7 +73,7 @@ export default function Reservations() {
   const handleFulfill = async (id) => {
     try {
       await api.put(`/reservations/${id}`, { status: 'Fulfilled' });
-      toast.success('Reservation fulfilled');
+      toast.success('Reservation marked as completed');
       fetchReservations();
     } catch (err) { toast.error('Update failed'); }
   };
@@ -181,14 +186,14 @@ export default function Reservations() {
                     <td>{r.reserved_for_days}</td>
                     <td>
                       <span className={`badge ${r.status === 'Active' ? 'badge-active' : r.status === 'Fulfilled' ? 'badge-returned' : 'badge-inactive'}`}>
-                        {r.status}
+                        {getReservationStatusLabel(r.status)}
                       </span>
                     </td>
                     <td>
                       {r.status === 'Active' && (
                         <div className="flex gap-2">
                           <button className="btn btn-success text-xs py-1 px-2" onClick={() => handleFulfill(r.id)}>
-                            <FiCheck size={14} /> Fulfill
+                            <FiCheck size={14} /> Complete
                           </button>
                           <button className="btn btn-danger text-xs py-1 px-2" onClick={() => handleCancel(r.id)}>
                             <FiX size={14} /> Cancel

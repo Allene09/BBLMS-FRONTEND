@@ -39,9 +39,13 @@ const FloatingParticles = () => (
 );
 
 export default function Login() {
+  const selfSignupEnabled = false;
   const { user, login, showTransition } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const borrowBookId = location.state?.borrowBookId || null;
+  const borrowBookTitle = location.state?.borrowBookTitle || null;
+  const hasBorrowIntent = Boolean(borrowBookId);
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -49,7 +53,7 @@ export default function Login() {
   const [mounted, setMounted] = useState(false);
 
   // Sign up states - check if navigated with showSignup state
-  const [showSignup, setShowSignup] = useState(location.state?.showSignup || false);
+  const [showSignup, setShowSignup] = useState(selfSignupEnabled ? (location.state?.showSignup || false) : false);
   const [signupForm, setSignupForm] = useState({ ...emptySignup });
   const [signupLoading, setSignupLoading] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
@@ -67,7 +71,14 @@ export default function Login() {
     api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
   }, []);
 
-  if (user) return <Navigate to="/app" />;
+  if (user) {
+    return (
+      <Navigate
+        to={hasBorrowIntent ? '/app/books' : '/app'}
+        state={hasBorrowIntent ? { borrowBookId, borrowBookTitle, autoBorrow: true } : undefined}
+      />
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,9 +91,18 @@ export default function Login() {
       const data = await login(userId, password);
       toast.success('Welcome back!');
       const role = data.user?.access_right;
-      const dest = ['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books';
+      const dest = hasBorrowIntent
+        ? '/app/books'
+        : (role === 'CIRCULATION_IN_CHARGE'
+            ? '/app/checkout'
+            : (['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books'));
       await showTransition('login', 3000);
-      navigate(dest);
+      navigate(
+        dest,
+        hasBorrowIntent
+          ? { state: { borrowBookId, borrowBookTitle, autoBorrow: true } }
+          : undefined
+      );
     } catch (err) {
       toast.error(err.response?.data?.error || 'Invalid credentials');
     } finally {
@@ -334,20 +354,21 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-500 text-sm">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={() => setShowSignup(true)}
-                className="text-blue-600 font-semibold hover:text-blue-700 transition-colors inline-flex items-center gap-1"
-              >
-                <FiUserPlus size={14} />
-                Sign Up
-              </button>
-            </p>
-          </div>
+          {selfSignupEnabled && (
+            <div className="mt-6 text-center">
+              <p className="text-gray-500 text-sm">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowSignup(true)}
+                  className="text-blue-600 font-semibold hover:text-blue-700 transition-colors inline-flex items-center gap-1"
+                >
+                  <FiUserPlus size={14} />
+                  Sign Up
+                </button>
+              </p>
+            </div>
+          )}
 
           <p className="text-center text-gray-400 text-sm mt-8 font-medium">
             Bohol Island State University — Bilar Campus
@@ -356,7 +377,7 @@ export default function Login() {
       </div>
 
       {/* Sign Up Modal */}
-      {showSignup && (
+      {selfSignupEnabled && showSignup && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowSignup(false)}>
           <div 
             className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-100"

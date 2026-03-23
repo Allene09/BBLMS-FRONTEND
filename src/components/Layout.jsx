@@ -3,19 +3,23 @@ import { useAuth } from '../context/AuthContext';
 import {
   PiHouseSimple as FiHome, PiBooks as FiBook, PiUsersThree as FiUsers, PiTruck as FiTruck, PiSignOut as FiLogOut,
   PiArrowCircleRight as FiArrowRightCircle, PiArrowCircleLeft as FiArrowLeftCircle, PiCalendarCheck as FiCalendar,
-  PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight,
+  PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight, PiWarning as FiWarning,
+  PiReceipt as FiReceipt, PiChartBar as FiChartBar,
 } from 'react-icons/pi';
 import { useState } from 'react';
 
 const navItems = [
-  { path: '/app',       icon: FiHome,             label: 'Dashboard',    end: true,  roles: ['ADMIN', 'LIBRARIAN'] },
-  { path: '/app/books', icon: FiBook,             label: 'Library Items',            roles: [] },
-  { path: '/app/borrowers', icon: FiUsers,         label: 'Borrowers',               roles: ['ADMIN', 'LIBRARIAN'] },
-  { path: '/app/suppliers', icon: FiTruck,         label: 'Suppliers',               roles: ['ADMIN', 'LIBRARIAN'] },
-  { path: '/app/checkout',  icon: FiArrowRightCircle, label: 'Check-out',            roles: ['ADMIN', 'LIBRARIAN'] },
-  { path: '/app/checkin',   icon: FiArrowLeftCircle,  label: 'Check-in',             roles: ['ADMIN', 'LIBRARIAN'] },
-  { path: '/app/reservations', icon: FiCalendar,  label: 'Reservations',            roles: ['ADMIN', 'LIBRARIAN', 'FACULTY'] },
-  { path: '/app/users',     icon: FiSettings,     label: 'System Users',             roles: ['ADMIN'] },
+  { path: '/app',       icon: FiHome,             label: 'Dashboard',    end: true,  roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
+  { path: '/app/books', icon: FiBook,             label: 'Library Items',            roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN', 'STAFF'] },
+  { path: '/app/borrowers', icon: FiUsers,         label: 'Borrowers',               roles: ['LIBRARIAN'] },
+  { path: '/app/suppliers', icon: FiTruck,         label: 'Suppliers',               roles: ['STAFF'] },
+  { path: '/app/checkout',  icon: FiArrowRightCircle, label: 'Borrow Book',          roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/checkin',   icon: FiArrowLeftCircle,  label: 'Return Book',          roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/overdue',   icon: FiWarning,          label: 'Overdue Monitoring',   roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/records',   icon: FiReceipt,          label: 'Borrow Records',       roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/reports',   icon: FiChartBar,         label: 'Reports',              roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
+  { path: '/app/reservations', icon: FiCalendar,  label: 'Reservations',            roles: ['LIBRARIAN'] },
+  { path: '/app/users',     icon: FiSettings,     label: 'System Users',             roles: ['ADMIN', 'ADMINISTRATOR'] },
 ];
 
 function canSee(item, userRole) {
@@ -24,9 +28,10 @@ function canSee(item, userRole) {
 
 const roleColors = {
   ADMIN: 'bg-blue-500/20 text-blue-300',
+  ADMINISTRATOR: 'bg-blue-500/20 text-blue-300',
   LIBRARIAN: 'bg-emerald-500/20 text-emerald-300',
-  FACULTY: 'bg-amber-500/20 text-amber-300',
-  USER: 'bg-purple-500/20 text-purple-300',
+  CIRCULATION_IN_CHARGE: 'bg-amber-500/20 text-amber-300',
+  STAFF: 'bg-purple-500/20 text-purple-300',
 };
 
 export default function Layout() {
