@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft } from 'react-icons/pi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft } from 'react-icons/pi';
 
 const emptyUser = {
   user_id: '', username: '', password: '', designation: '',
@@ -56,16 +56,6 @@ export default function Users() {
     setForm({ ...user, password: '' });
     setEditing(true);
     setShowModal(true);
-  };
-
-  const handleDelete = async (user) => {
-    if (user.user_id === 'ADMIN') return toast.error('Cannot delete default admin');
-    if (!window.confirm(`Delete user "${user.username}"?`)) return;
-    try {
-      await api.delete(`/users/${user.id}`);
-      toast.success('User deleted');
-      fetchUsers();
-    } catch (err) { toast.error(err.response?.data?.error || 'Delete failed'); }
   };
 
   const handleSubmit = async (e) => {
@@ -217,20 +207,9 @@ export default function Users() {
                   </td>
                   <td>
                     <div className="flex gap-2">
-                      <button className="btn btn-success text-xs py-1 px-2" onClick={() => handleBorrowClick(u)}>
-                        <FiBook size={14} /> Borrow
-                      </button>
-                      <button className="btn btn-info text-xs py-1 px-2" onClick={() => handleReturnClick(u)}>
-                        <FiCornerDownLeft size={14} /> Return
-                      </button>
                       <button className="btn btn-warning text-xs py-1 px-2" onClick={() => handleEdit(u)}>
                         <FiEdit2 size={14} /> Edit
                       </button>
-                      {u.user_id !== 'ADMIN' && (
-                        <button className="btn btn-danger text-xs py-1 px-2" onClick={() => handleDelete(u)}>
-                          <FiTrash2 size={14} /> Delete
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
