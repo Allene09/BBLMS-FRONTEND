@@ -7,7 +7,7 @@ import {
   PiChartBar as FiBarChart2, PiShieldCheck as FiShield, PiList as FiMenu, PiX as FiX, PiCheck as FiCheck,
   PiArrowRight as FiArrowRight, PiEnvelopeSimple as FiMail, PiPhone as FiPhone, PiMapPin as FiMapPin, PiClock as FiClock,
   PiTrendUp as FiTrendingUp, PiDatabase as FiDatabase, PiGlobe as FiGlobe, PiStar as FiStar,
-  PiMagnifyingGlass as FiSearch,
+  PiMagnifyingGlass as FiSearch, PiCaretDown,
 } from 'react-icons/pi';
 
 const features = [
@@ -117,6 +117,20 @@ export default function LandingPage() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchTouched, setSearchTouched] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+        setCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleGoToLogin = async (state) => {
     setMenuOpen(false);
@@ -219,24 +233,64 @@ export default function LandingPage() {
               ))}
 
               <div className="relative w-[380px]">
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => {
-                      setSelectedCategory(e.target.value);
-                      setSearchTouched(true);
-                    }}
-                    className={`w-36 rounded-lg border px-2.5 py-2 text-xs outline-none transition ${
-                      scrolled ? 'bg-white text-gray-700 border-gray-200' : 'bg-white/10 text-blue-100 border-white/20'
-                    }`}
-                  >
-                    <option value="all">All Categories</option>
-                    {availableCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                <div className="relative flex items-center gap-2">
+                  <div className="relative" ref={categoryDropdownRef}>
+                    <button
+                      onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                      className={`w-36 flex items-center justify-between rounded-lg border px-2.5 py-2 text-xs outline-none transition ${
+                        scrolled 
+                          ? 'bg-white/70 backdrop-blur-md text-gray-700 border-gray-200/60 shadow-sm hover:bg-white/90' 
+                          : 'bg-white/10 backdrop-blur-md text-blue-50 border-white/20 hover:bg-white/20'
+                      }`}
+                    >
+                      <span className="truncate">
+                        {selectedCategory === 'all' ? 'All Categories' : selectedCategory}
+                      </span>
+                      <PiCaretDown className={`transition-transform duration-200 ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {categoryDropdownOpen && (
+                      <div className={`absolute left-0 top-[110%] w-48 rounded-xl border shadow-2xl z-50 overflow-hidden backdrop-blur-xl transition-all ${
+                        scrolled 
+                          ? 'bg-white/80 border-white/60 text-gray-700 shadow-gray-200/50' 
+                          : 'bg-slate-900/60 border-white/10 text-white shadow-black/50'
+                      }`}>
+                        <div className="max-h-64 overflow-y-auto py-1 custom-scrollbar">
+                           <button
+                             onClick={() => {
+                               setSelectedCategory('all');
+                               setSearchTouched(true);
+                               setCategoryDropdownOpen(false);
+                             }}
+                             className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${
+                               selectedCategory === 'all' 
+                                 ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
+                                 : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
+                             }`}
+                           >
+                             All Categories
+                           </button>
+                           {availableCategories.map((category) => (
+                             <button
+                               key={category}
+                               onClick={() => {
+                                 setSelectedCategory(category);
+                                 setSearchTouched(true);
+                                 setCategoryDropdownOpen(false);
+                               }}
+                               className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${
+                                 selectedCategory === category
+                                   ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
+                                   : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
+                               }`}
+                             >
+                               {category}
+                             </button>
+                           ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="relative flex-1">
                     <FiSearch
