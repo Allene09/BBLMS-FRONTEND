@@ -65,24 +65,34 @@ function StatCard({ cfg, value, index }) {
     <div
       ref={ref}
       style={{ animationDelay: `${index * 80}ms` }}
-      className={`bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden ${
+      className={`bg-white/30 backdrop-blur-2xl border border-white/60 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${
         visible ? 'anim-fade-up' : 'opacity-0'
       }`}
     >
-      {/* Top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: cfg.gradient }} />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+      
+      {/* Glowing background orb for the card */}
+      <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full filter blur-[40px] opacity-20 pointer-events-none transition-opacity duration-300 group-hover:opacity-50" style={{ background: cfg.accent }} />
 
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: cfg.bg }}>
-          <cfg.icon size={20} style={{ color: cfg.accent }} />
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex items-start justify-between mb-5">
+          <div className="w-14 h-14 rounded-[1.25rem] flex items-center justify-center flex-shrink-0 shadow-sm border border-white/60 relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+            <div className="absolute inset-0 opacity-20" style={{ background: cfg.gradient }} />
+            <div className="relative z-10 p-3 rounded-xl bg-white/40 backdrop-blur-md shadow-sm">
+              <cfg.icon size={26} style={{ color: cfg.accent }} className="drop-shadow-sm" />
+            </div>
+          </div>
+          <div className="px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 bg-white/50 border border-white/60 shadow-sm backdrop-blur-md">
+            <FiTrendingUp size={12} style={{ color: cfg.accent }} />
+            <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: cfg.accent }}>Active</span>
+          </div>
         </div>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-gray-50">
-          <FiTrendingUp size={12} className="text-gray-300" />
+
+        <div className="mt-auto">
+          <p className="text-3xl lg:text-4xl font-black text-slate-800 leading-none mb-1.5 drop-shadow-sm tracking-tight">{displayValue}</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/80">{cfg.label}</p>
         </div>
       </div>
-
-      <p className="text-2xl font-black text-gray-900 leading-none mb-1">{displayValue}</p>
-      <p className="text-xs font-medium text-gray-400">{cfg.label}</p>
     </div>
   );
 }
@@ -138,77 +148,108 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-7">
-        <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Library overview and recent activity</p>
+    <div className="min-h-[calc(100vh-80px)] -m-6 p-6 lg:p-10 relative overflow-hidden flex flex-col font-sans">
+      {/* Soft blurred gradient background - Dashboard default Theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#eff6ff] to-[#f5f3ff] z-0" />
+      
+      {/* Decorative blurred orbs */}
+      <div className="absolute top-[-10%] left-[-5%] w-[40rem] h-[40rem] bg-blue-200/40 rounded-full mix-blend-multiply filter blur-[120px] z-0" />
+      <div className="absolute top-[20%] right-[-10%] w-[35rem] h-[35rem] bg-purple-200/30 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
+      <div className="absolute bottom-[-15%] left-[20%] w-[45rem] h-[45rem] bg-indigo-200/30 rounded-full mix-blend-multiply filter blur-[150px] z-0" />
+
+      {/* Main Content Wrapper */}
+      <div className="relative z-10 max-w-[1600px] w-full mx-auto flex-1 flex flex-col">
+        {/* Page header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight drop-shadow-sm">Dashboard</h1>
+            <p className="text-sm lg:text-base text-slate-600/80 font-semibold mt-1 ml-1">Library overview and real-time statistics</p>
+          </div>
+          <button
+            onClick={() => load(true)}
+            disabled={refreshing}
+            className="group inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl text-sm font-bold text-blue-700 bg-white/40 border border-white/60 hover:bg-white/60 transition-all duration-300 disabled:opacity-50 shadow-[0_4px_15px_rgb(0,0,0,0.02)] backdrop-blur-md"
+          >
+            <FiRefreshCw size={16} className={`${refreshing ? 'animate-spin text-blue-500' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+            {refreshing ? 'Syncing...' : 'Sync Data'}
+          </button>
         </div>
-        <button
-          onClick={() => load(true)}
-          disabled={refreshing}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition disabled:opacity-50 shadow-sm"
-        >
-          <FiRefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-          Refresh
-        </button>
-      </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {statConfigs.map((cfg, i) => (
           <StatCard key={cfg.key} cfg={cfg} value={statValues[cfg.key]} index={i} />
         ))}
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-gray-900">Recent Transactions</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Latest loan activity</p>
+      <div className="bg-white/30 backdrop-blur-2xl rounded-[2rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col flex-1 relative min-h-[400px]">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        
+        <div className="px-8 py-6 border-b border-white/40 flex items-center justify-between relative z-10 bg-white/20 backdrop-blur-md">
+          <div className="flex items-center gap-4">
+             <div className="w-12 h-12 rounded-[1rem] bg-gradient-to-br from-indigo-100 to-blue-100 flex items-center justify-center border border-white/60 shadow-sm text-indigo-500">
+               <FiBook size={24} />
+             </div>
+             <div>
+              <h2 className="text-lg font-black text-slate-800 tracking-tight">Recent Transactions</h2>
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/70 mt-1">Live Circulation Stream</p>
+            </div>
           </div>
-          <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2.5 py-1 rounded-lg">
-            {stats.recentLoans.length} records
+          <span className="text-[10px] uppercase tracking-widest text-indigo-700 font-bold bg-indigo-100/50 border border-indigo-200/50 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm">
+            {stats.recentLoans.length} Event{stats.recentLoans.length !== 1 && 's'} Found
           </span>
         </div>
 
         {stats.recentLoans.length === 0 ? (
-          <div className="flex flex-col items-center py-14 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
-              <FiBook size={24} className="text-gray-300" />
+          <div className="flex flex-col items-center justify-center flex-1 py-14 text-center relative z-10">
+            <div className="w-20 h-20 rounded-full bg-white/50 border border-white/60 shadow-inner flex items-center justify-center mb-5">
+              <FiBook size={32} className="text-indigo-300" />
             </div>
-            <p className="text-gray-400 text-sm font-medium">No transactions yet</p>
-            <p className="text-gray-300 text-xs mt-1">Checked-out books will appear here</p>
+            <p className="text-slate-700 text-lg font-bold tracking-tight">No Live Transactions</p>
+            <p className="text-slate-500/70 text-xs font-semibold mt-1">Checked-out books will appear here instantly</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Book Title</th>
-                  <th>Borrower</th>
-                  <th>Loan Date</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
+          <div className="overflow-x-auto relative z-10 custom-scrollbar">
+            <table className="w-full text-left border-collapse min-w-[900px]">
+              <thead className="bg-white/20 backdrop-blur-md sticky top-0 z-20">
+                <tr className="border-b border-white/40">
+                  <th className="p-5 pl-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Book Detail</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Borrower</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Loan Timeline</th>
+                  <th className="p-5 pr-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/30">
                 {stats.recentLoans.map((loan) => {
-                  const s = statusStyle[loan.status] || { bg: '#f1f5f9', color: '#475569' };
+                  const isReturned = loan.status === 'Returned';
+                  const isOverdue = loan.status === 'Overdue';
                   return (
-                    <tr key={loan.id}>
-                      <td>
-                        <span className="font-semibold text-gray-900">{loan.book_title}</span>
+                    <tr key={loan.id} className="group hover:bg-white/40 transition-colors duration-200">
+                      <td className="p-5 pl-8">
+                        <span className="font-bold text-slate-800 text-sm">{loan.book_title}</span>
                       </td>
-                      <td className="text-gray-600">{loan.borrower_name}</td>
-                      <td className="text-gray-500">{loan.loan_date}</td>
-                      <td className="text-gray-500">{loan.due_date}</td>
-                      <td>
+                      <td className="p-5">
+                        <div className="flex items-center gap-3">
+                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shadow-sm border border-white/60 ${isReturned ? 'bg-emerald-100/50 text-emerald-700' : isOverdue ? 'bg-red-100/50 text-red-700' : 'bg-indigo-100/50 text-indigo-700'}`}>
+                             {loan.borrower_name?.charAt(0).toUpperCase()}
+                           </div>
+                           <span className="font-bold text-slate-700 text-sm">{loan.borrower_name}</span>
+                        </div>
+                      </td>
+                      <td className="p-5">
+                         <div className="flex flex-col gap-0.5">
+                           <span className="text-xs font-semibold text-slate-700">Issued: <span className="font-mono text-slate-600 bg-white/40 px-1.5 py-0.5 rounded backdrop-blur-sm border border-white/40">{loan.loan_date}</span></span>
+                           <span className="text-[10px] font-medium text-slate-500/70">Due: {loan.due_date}</span>
+                         </div>
+                      </td>
+                      <td className="p-5 pr-8 text-right">
                         <span
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
-                          style={{ background: s.bg, color: s.color }}
+                          className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm backdrop-blur-sm ${
+                            isReturned ? 'bg-emerald-100/60 text-emerald-700 border-emerald-200/50' :
+                            isOverdue ? 'bg-red-100/60 text-red-700 border-red-200/50' :
+                            'bg-indigo-100/60 text-indigo-700 border-indigo-200/50'
+                          }`}
                         >
                           {loan.status}
                         </span>
@@ -220,6 +261,7 @@ export default function Dashboard() {
             </table>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

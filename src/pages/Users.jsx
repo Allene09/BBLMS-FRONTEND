@@ -167,50 +167,82 @@ export default function Users() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="min-h-[calc(100vh-80px)] -m-6 p-6 lg:p-10 relative overflow-hidden flex flex-col font-sans">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#eff6ff] to-[#f5f3ff] z-0" />
+      
+      {/* Soft floating gradient orbs */}
+      <div className="absolute top-[-10%] left-[-5%] w-[40rem] h-[40rem] bg-blue-300/50 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
+      <div className="absolute top-[20%] right-[-10%] w-[35rem] h-[35rem] bg-purple-300/40 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
+      <div className="absolute bottom-[-20%] left-[20%] w-[45rem] h-[45rem] bg-indigo-300/40 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
+
+      <div className="relative z-10 max-w-[1600px] w-full mx-auto flex-1 flex flex-col">
+      {/* Header */}
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">System Users</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Manage user accounts and access rights</p>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight drop-shadow-sm mb-2">System Users</h1>
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">Manage Accounts & Access Rights</p>
         </div>
-        <button className="btn btn-primary" onClick={handleNew}><FiPlus size={16} /> Add User</button>
+        <button 
+          onClick={handleNew}
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_10px_25px_rgba(79,70,229,0.4)] hover:-translate-y-0.5"
+        >
+          <FiPlus size={16} className="text-indigo-200" /> Appoint User
+        </button>
       </div>
 
-      <div className="card p-0 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>UserID</th>
-                <th>UserName</th>
-                <th>Designation</th>
-                <th>Access Right</th>
-                <th>Admin</th>
-                <th>Actions</th>
+      {/* Main Table */}
+      <div className="bg-white/30 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <div className="overflow-x-auto relative z-10 custom-scrollbar max-h-[calc(100vh-200px)] min-h-[500px]">
+          <table className="w-full text-left border-collapse min-w-[900px]">
+            <thead className="bg-white/20 backdrop-blur-md sticky top-0 z-20">
+              <tr className="border-b border-white/40">
+                <th className="p-5 pl-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Identity</th>
+                <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Role / Designation</th>
+                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Access Right</th>
+                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">System Admin</th>
+                <th className="p-5 pr-8 text-right text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/30">
               {users.length === 0 ? (
-                <tr><td colSpan={6} className="text-center text-gray-500 py-8">No users found</td></tr>
+                <tr><td colSpan={5} className="text-center py-16">
+                   <div className="flex flex-col items-center justify-center text-slate-400">
+                    <FiSearch size={32} className="mb-4 opacity-50 block mx-auto" />
+                    <p className="font-black text-sm">No system users assigned.</p>
+                  </div>
+                </td></tr>
               ) : users.map((u) => (
-                <tr key={u.id}>
-                  <td className="font-mono font-medium">{u.user_id}</td>
-                  <td>{u.username}</td>
-                  <td>{u.designation}</td>
-                  <td><span className="badge badge-active">{u.access_right}</span></td>
-                  <td>
+                <tr key={u.id} className="hover:bg-white/40 transition-colors group cursor-default">
+                  <td className="p-4 pl-8">
+                    <p className="font-bold text-sm text-slate-800">{u.username}</p>
+                    <p className="text-[10px] text-indigo-500 font-black">ID: {u.user_id}</p>
+                  </td>
+                  <td className="p-4">
+                    <p className="font-bold text-sm text-slate-700">{u.designation || 'General Staff'}</p>
+                  </td>
+                  <td className="p-4 text-center">
+                    <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur-sm border bg-emerald-100/60 text-emerald-700 border-emerald-200/50">
+                      {u.access_right}
+                    </span>
+                  </td>
+                  <td className="p-4 text-center">
                     {u.is_admin ? (
-                      <FiShield className="text-amber-500" size={18} />
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100/60 border border-amber-200/60 shadow-sm">
+                        <FiShield className="text-amber-600" size={16} />
+                      </div>
                     ) : (
-                      <span className="text-gray-300">-</span>
+                      <span className="text-slate-300 font-bold">—</span>
                     )}
                   </td>
-                  <td>
-                    <div className="flex gap-2">
-                      <button className="btn btn-warning text-xs py-1 px-2" onClick={() => handleEdit(u)}>
-                        <FiEdit2 size={14} /> Edit
-                      </button>
-                    </div>
+                  <td className="p-4 pr-8 text-right">
+                    <button 
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-indigo-50 hover:border-indigo-200/60 text-indigo-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md" 
+                      onClick={() => handleEdit(u)}
+                    >
+                      <FiEdit2 size={14} /> Configure
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -221,257 +253,98 @@ export default function Users() {
 
       {/* Edit/Add User Modal */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-800">{editing ? 'Edit User' : 'Add User'}</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
+            
+            <div className="p-6 lg:p-8 relative z-10">
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                  <label className="form-label">User ID *</label>
-                  <input className="form-input" value={form.user_id} onChange={(e) => handleChange('user_id', e.target.value)}
-                    required disabled={editing} />
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">{editing ? 'Configure Profile' : 'Appoint User'}</h2>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Access Management Matrix</p>
                 </div>
-                <div>
-                  <label className="form-label">Username *</label>
-                  <input className="form-input" value={form.username} onChange={(e) => handleChange('username', e.target.value)} required />
-                </div>
-                <div>
-                  <label className="form-label">{editing ? 'New Password (leave blank to keep)' : 'Password *'}</label>
-                  <input type="password" className="form-input" value={form.password}
-                    onChange={(e) => handleChange('password', e.target.value)} required={!editing} />
-                </div>
-                <div>
-                  <label className="form-label">Designation</label>
-                  <input className="form-input" value={form.designation} onChange={(e) => handleChange('designation', e.target.value)} />
-                </div>
-                <div>
-                  <label className="form-label">Access Right</label>
-                  <select className="form-input" value={form.access_right} onChange={(e) => handleChange('access_right', e.target.value)}>
-                    <option>STAFF</option>
-                    <option>LIBRARIAN</option>
-                    <option>CIRCULATION_IN_CHARGE</option>
-                    <option>ADMIN</option>
-                  </select>
-                </div>
-                <div className="flex items-end">
-                  <label className="flex items-center gap-2 pb-2">
-                    <input type="checkbox" checked={form.is_admin} onChange={(e) => handleChange('is_admin', e.target.checked)} className="w-4 h-4" />
-                    <span className="text-sm font-medium text-gray-700">Admin Privileges</span>
-                  </label>
-                </div>
-              </div>
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
-                <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Saving...' : (editing ? 'Update' : 'Save')}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Borrow Book Modal */}
-      {showBorrowModal && selectedUser && (
-        <div className="modal-overlay" onClick={() => setShowBorrowModal(false)}>
-          <div className="modal-content" style={{ maxWidth: '800px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-800">Borrow Book</h2>
-                <p className="text-sm text-gray-500">User: <span className="font-semibold text-blue-600">{selectedUser.username}</span> ({selectedUser.user_id})</p>
-              </div>
-              <button onClick={() => setShowBorrowModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Left: Book Selection */}
-              <div className="space-y-4">
-                <div>
-                  <label className="form-label flex items-center gap-2">
-                    <FiSearch size={14} /> Search Books
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      className="form-input"
-                      placeholder="Search by title, author, barcode..."
-                      value={bookSearch}
-                      onChange={(e) => setBookSearch(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && searchBooks()}
-                    />
-                    <button type="button" className="btn btn-outline" onClick={searchBooks}>
-                      <FiSearch size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="border rounded-lg overflow-hidden max-h-64 overflow-y-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
-                      <tr>
-                        <th className="text-left p-2 font-semibold text-gray-600">Title</th>
-                        <th className="text-left p-2 font-semibold text-gray-600">Author</th>
-                        <th className="text-center p-2 font-semibold text-gray-600">Avail</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredBooks.length === 0 ? (
-                        <tr><td colSpan={3} className="text-center text-gray-400 py-4">No books available</td></tr>
-                      ) : filteredBooks.map((book) => (
-                        <tr
-                          key={book.id}
-                          className={`cursor-pointer hover:bg-blue-50 transition ${selectedBook?.id === book.id ? 'bg-blue-100' : ''} ${book.copies_available <= 0 ? 'opacity-50' : ''}`}
-                          onClick={() => book.copies_available > 0 && setSelectedBook(book)}
-                        >
-                          <td className="p-2 font-medium truncate max-w-[180px]">{book.title}</td>
-                          <td className="p-2 text-gray-600 truncate max-w-[100px]">{book.author || '-'}</td>
-                          <td className="p-2 text-center">
-                            <span className={`badge ${book.copies_available > 0 ? 'badge-active' : 'badge-inactive'}`}>
-                              {book.copies_available}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {selectedBook && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-xs text-green-600 font-semibold mb-1">Selected Book</p>
-                    <p className="text-sm font-medium text-green-800">{selectedBook.title}</p>
-                    <p className="text-xs text-green-600">{selectedBook.author} • {selectedBook.barcode || 'No barcode'}</p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="form-label">Due Date *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-primary w-full"
-                  onClick={handleBorrowSubmit}
-                  disabled={borrowLoading || !selectedBook}
-                >
-                  <FiCheck size={16} /> {borrowLoading ? 'Processing...' : 'Confirm Checkout'}
+                <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                  <FiX size={20} />
                 </button>
               </div>
 
-              {/* Right: Current Loans */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                  <FiList size={14} /> Current Loans ({userLoans.length})
-                </h3>
-                <div className="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
-                  {userLoans.length === 0 ? (
-                    <div className="text-center text-gray-400 py-8">
-                      <FiBook size={24} className="mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No active loans</p>
-                    </div>
-                  ) : (
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-50 sticky top-0">
-                        <tr>
-                          <th className="text-left p-2 font-semibold text-gray-600">Book</th>
-                          <th className="text-left p-2 font-semibold text-gray-600">Due</th>
-                          <th className="text-center p-2 font-semibold text-gray-600">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {userLoans.map((loan) => (
-                          <tr key={loan.id} className="border-t">
-                            <td className="p-2 font-medium truncate max-w-[150px]">{loan.book_title}</td>
-                            <td className="p-2 text-gray-600 text-xs">{loan.due_date?.split('T')[0]}</td>
-                            <td className="p-2 text-center">
-                              <span className={`badge ${loan.status?.toLowerCase() === 'loaned' ? 'badge-loaned' : loan.status?.toLowerCase() === 'overdue' ? 'badge-overdue' : 'badge-returned'}`}>
-                                {loan.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Return Book Modal */}
-      {showReturnModal && returnUser && (
-        <div className="modal-overlay" onClick={() => setShowReturnModal(false)}>
-          <div className="modal-content" style={{ maxWidth: '550px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-800">Return Book</h2>
-                <p className="text-sm text-gray-500">User: <span className="font-semibold text-blue-600">{returnUser.username}</span> ({returnUser.user_id})</p>
-              </div>
-              <button onClick={() => setShowReturnModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                <FiList size={14} /> Active Loans ({returnLoans.length})
-              </h3>
-              <div className="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
-                {returnLoans.length === 0 ? (
-                  <div className="text-center text-gray-400 py-8">
-                    <FiBook size={24} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No active loans to return</p>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="md:col-span-1">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID *</label>
+                    <input 
+                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner disabled:opacity-50" 
+                      value={form.user_id} onChange={(e) => handleChange('user_id', e.target.value)} required disabled={editing} 
+                      placeholder="e.g. EMP-001"
+                    />
                   </div>
-                ) : (
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
-                      <tr>
-                        <th className="text-left p-2 font-semibold text-gray-600">Book</th>
-                        <th className="text-left p-2 font-semibold text-gray-600">Due Date</th>
-                        <th className="text-center p-2 font-semibold text-gray-600">Status</th>
-                        <th className="text-center p-2 font-semibold text-gray-600">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {returnLoans.map((loan) => (
-                        <tr key={loan.id} className="border-t hover:bg-gray-50">
-                          <td className="p-2 font-medium truncate max-w-[150px]">{loan.book_title}</td>
-                          <td className="p-2 text-gray-600 text-xs">{loan.due_date?.split('T')[0]}</td>
-                          <td className="p-2 text-center">
-                            <span className={`badge ${loan.status?.toLowerCase() === 'overdue' ? 'badge-overdue' : 'badge-loaned'}`}>
-                              {loan.status}
-                            </span>
-                          </td>
-                          <td className="p-2 text-center">
-                            <button
-                              className="btn btn-success text-xs py-1 px-2"
-                              onClick={() => handleReturnBook(loan)}
-                              disabled={returnLoading}
-                            >
-                              <FiCornerDownLeft size={12} /> Return
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Username *</label>
+                    <input 
+                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
+                      value={form.username} onChange={(e) => handleChange('username', e.target.value)} required 
+                      placeholder="Display Name"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">{editing ? 'Regenerate Password (Optional)' : 'Secret Password *'}</label>
+                    <input 
+                      type="password" 
+                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
+                      value={form.password} onChange={(e) => handleChange('password', e.target.value)} required={!editing} 
+                      placeholder={editing ? "Leave blank to keep existing password" : "Enter a secure password"}
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
+                    <input 
+                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
+                      value={form.designation} onChange={(e) => handleChange('designation', e.target.value)} 
+                      placeholder="e.g. Head Librarian"
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
+                    <select 
+                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner appearance-none custom-select cursor-pointer" 
+                      value={form.access_right} onChange={(e) => handleChange('access_right', e.target.value)}
+                    >
+                      <option value="STAFF">Staff Level</option>
+                      <option value="LIBRARIAN">Librarian Level</option>
+                      <option value="CIRCULATION_IN_CHARGE">Circulation Dept</option>
+                      <option value="ADMIN">Administrator Level</option>
+                    </select>
+                  </div>
+                </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-              <button type="button" className="btn btn-secondary" onClick={() => setShowReturnModal(false)}>Close</button>
+                <div className="mt-4 p-4 bg-amber-50/50 border border-amber-200/50 rounded-2xl backdrop-blur-sm">
+                  <label className="flex items-center justify-between cursor-pointer group">
+                    <div>
+                      <span className="text-sm font-black text-amber-900 drop-shadow-sm flex items-center gap-2">
+                        <FiShield className="text-amber-600" /> Grant Root Privileges
+                      </span>
+                      <p className="text-[10px] font-bold text-amber-700/70 mt-1">This permits overriding system configs and editing other users.</p>
+                    </div>
+                    <div className="relative">
+                      <input type="checkbox" checked={form.is_admin} onChange={(e) => handleChange('is_admin', e.target.checked)} className="peer sr-only" />
+                      <div className="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-6 mt-2">
+                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowModal(false)}>Cancel</button>
+                  <button type="submit" className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)]" disabled={loading}>
+                    {loading ? 'Authenticating...' : (editing ? 'Update Profile' : 'Appoint Network User')}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
