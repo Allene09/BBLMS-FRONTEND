@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX, PiCheck as FiCheck, PiListBullets as FiList, PiCalendarCheck as FiCalendar } from 'react-icons/pi';
+import { PiPlus as FiPlus, PiMinus as FiMinus, PiPencilSimple as FiEdit2, PiTrash as FiTrash2, PiArrowsClockwise as FiRefreshCw, PiMagnifyingGlass as FiSearch, PiX as FiX, PiCheck as FiCheck, PiListBullets as FiList, PiCalendarCheck as FiCalendar } from 'react-icons/pi';
 
 const emptyBook = {
   title: '', author: '', co_author: '', type: 'Book', publisher: '', place: '',
@@ -30,6 +30,15 @@ export default function Books() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [addingCopyId, setAddingCopyId] = useState(null);
+  const [showAddCopyModal, setShowAddCopyModal] = useState(false);
+  const [addCopyBook, setAddCopyBook] = useState(null);
+  const [copyQuantity, setCopyQuantity] = useState(1);
+
+  const [showDecreaseCopyModal, setShowDecreaseCopyModal] = useState(false);
+  const [decreaseCopyBook, setDecreaseCopyBook] = useState(null);
+  const [decreaseQuantity, setDecreaseQuantity] = useState(1);
+  
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, onConfirm: null });
 
   // Borrow states
   const [showBorrowModal, setShowBorrowModal] = useState(false);
@@ -187,24 +196,84 @@ export default function Books() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddCopy = async (book) => {
-    setAddingCopyId(book.id);
-    try {
-      const updatedCopies = Number(book.copies_available || 0) + 1;
-      const payload = { ...book, copies_available: updatedCopies };
-      const res = await api.put(`/books/${book.id}`, payload);
-      const updated = res.data;
+  const handleAddCopyClick = (book) => {
+    setAddCopyBook(book);
+    setCopyQuantity(1);
+    setShowAddCopyModal(true);
+  };
 
-      setBooks((prev) => prev.map((b) => (b.id === book.id ? { ...b, ...updated } : b)));
-      if (selected?.id === book.id) {
-        setSelected((prev) => ({ ...prev, ...updated }));
+  const handleConfirmAddCopy = () => {
+    if (!addCopyBook) return;
+    
+    setConfirmDialog({
+      isOpen: true,
+      onConfirm: async () => {
+        setConfirmDialog({ isOpen: false, onConfirm: null });
+        setAddingCopyId(addCopyBook.id);
+        setShowAddCopyModal(false);
+        try {
+          const updatedCopies = Number(addCopyBook.copies_available || 0) + Number(copyQuantity);
+          const payload = { ...addCopyBook, copies_available: updatedCopies };
+          const res = await api.put(`/books/${addCopyBook.id}`, payload);
+          const updated = res.data;
+
+          setBooks((prev) => prev.map((b) => (b.id === addCopyBook.id ? { ...b, ...updated } : b)));
+          if (selected?.id === addCopyBook.id) {
+            setSelected((prev) => ({ ...prev, ...updated }));
+          }
+          toast.success(`Copies updated to ${updated.copies_available}`);
+        } catch (err) {
+          toast.error(err.response?.data?.error || 'Failed to add copy');
+        } finally {
+          setAddingCopyId(null);
+          setAddCopyBook(null);
+        }
       }
-      toast.success(`Copies updated to ${updated.copies_available}`);
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to add copy');
-    } finally {
-      setAddingCopyId(null);
+    });
+  };
+
+  const handleDecreaseCopyClick = (book) => {
+    setDecreaseCopyBook(book);
+    setDecreaseQuantity(1);
+    setShowDecreaseCopyModal(true);
+  };
+
+  const handleConfirmDecreaseCopy = () => {
+    if (!decreaseCopyBook) return;
+
+    const currentCopies = Number(decreaseCopyBook.copies_available || 0);
+    const quantityToDeduct = Number(decreaseQuantity);
+    
+    if (quantityToDeduct > currentCopies) {
+      toast.error('Cannot remove more copies than available.');
+      return;
     }
+
+    setConfirmDialog({
+      isOpen: true,
+      onConfirm: async () => {
+        setConfirmDialog({ isOpen: false, onConfirm: null });
+        setAddingCopyId(decreaseCopyBook.id);
+        setShowDecreaseCopyModal(false);
+        try {
+          const updatedCopies = currentCopies - quantityToDeduct;
+          const payload = { ...decreaseCopyBook, copies_available: updatedCopies };
+          const res = await api.put(`/books/${decreaseCopyBook.id}`, payload);
+          const updated = res.data;
+
+          setBooks((prev) => prev.map((b) => (b.id === decreaseCopyBook.id ? { ...b, ...updated } : b)));
+          if (selected?.id === decreaseCopyBook.id) {
+            setSelected((prev) => ({ ...prev, ...updated }));
+          }
+          toast.success(`Copies updated to ${updated.copies_available}`);
+        } catch (err) {
+          toast.error(err.response?.data?.error || 'Failed to decrease copy');
+        } finally {
+          setAddingCopyId(null);
+          setDecreaseCopyBook(null);
+        }
+      }
+    });
   };
 
   // Borrow handlers
@@ -390,18 +459,32 @@ export default function Books() {
                       </td>
                       <td className="p-4 pr-8 text-right">
                         {canIncrementCopies && (
-                          <button
-                            type="button"
-                            className="p-2 rounded-xl bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors opacity-0 group-hover:opacity-100 shadow-sm border border-indigo-200/50"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddCopy(book);
-                            }}
-                            title="Add copy"
-                            disabled={addingCopyId === book.id}
-                          >
-                            <FiPlus size={14} className={addingCopyId === book.id ? 'animate-spin' : ''} />
-                          </button>
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              type="button"
+                              className={`p-2 rounded-xl transition-colors shadow-sm border flex-shrink-0 ${book.copies_available <= 0 ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-red-100 text-red-700 hover:bg-red-200 border-red-200/50'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDecreaseCopyClick(book);
+                              }}
+                              title="Decrease copy"
+                              disabled={addingCopyId === book.id || book.copies_available <= 0}
+                            >
+                              <FiMinus size={14} className={addingCopyId === book.id ? 'animate-pulse' : ''} />
+                            </button>
+                            <button
+                              type="button"
+                              className="p-2 rounded-xl bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors shadow-sm border border-indigo-200/50 flex-shrink-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddCopyClick(book);
+                              }}
+                              title="Add copy"
+                              disabled={addingCopyId === book.id}
+                            >
+                              <FiPlus size={14} className={addingCopyId === book.id ? 'animate-spin' : ''} />
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -778,6 +861,117 @@ export default function Books() {
 
               <div className="flex justify-end gap-3 pt-4 border-t mt-4">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowReturnModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Copy Modal */}
+        {showAddCopyModal && addCopyBook && (
+          <div className="modal-overlay" onClick={() => setShowAddCopyModal(false)}>
+            <div className="modal-content" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-800">Add Copies</h2>
+                <button onClick={() => setShowAddCopyModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+              </div>
+              <div className="space-y-4">
+                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                  <p className="text-xs text-indigo-600 font-semibold mb-1">Selected Book</p>
+                  <p className="text-base font-bold text-indigo-900">{addCopyBook.title}</p>
+                  <p className="text-sm text-indigo-700">{addCopyBook.author || 'Unknown Author'}</p>
+                  <div className="flex gap-4 mt-2 text-xs text-indigo-600">
+                    <span>Current Copies: {addCopyBook.copies_available}</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">Number of Copies to Add *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="form-input"
+                    value={copyQuantity}
+                    onChange={(e) => setCopyQuantity(parseInt(e.target.value, 10) || 1)}
+                  />
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowAddCopyModal(false)}>Cancel</button>
+                  <button type="button" className="btn btn-primary" onClick={handleConfirmAddCopy}>Confirm</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Decrease Copy Modal */}
+        {showDecreaseCopyModal && decreaseCopyBook && (
+          <div className="modal-overlay" onClick={() => setShowDecreaseCopyModal(false)}>
+            <div className="modal-content" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-800">Decrease Copies</h2>
+                <button onClick={() => setShowDecreaseCopyModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+              </div>
+              <div className="space-y-4">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-xs text-red-600 font-semibold mb-1">Selected Book</p>
+                  <p className="text-base font-bold text-red-900">{decreaseCopyBook.title}</p>
+                  <p className="text-sm text-red-700">{decreaseCopyBook.author || 'Unknown Author'}</p>
+                  <div className="flex gap-4 mt-2 text-xs text-red-600">
+                    <span>Current Copies: {decreaseCopyBook.copies_available}</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">Number of Copies to Deduct *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max={decreaseCopyBook.copies_available || 1}
+                    className="form-input"
+                    value={decreaseQuantity}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        setDecreaseQuantity('');
+                      } else {
+                        const parsed = parseInt(val, 10);
+                        setDecreaseQuantity(parsed > decreaseCopyBook.copies_available ? decreaseCopyBook.copies_available : parsed);
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Cannot drop below zero.</p>
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowDecreaseCopyModal(false)}>Cancel</button>
+                  <button type="button" className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" onClick={handleConfirmDecreaseCopy} disabled={!decreaseQuantity || decreaseQuantity <= 0}>Confirm</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Global Confirmation Modal */}
+        {confirmDialog.isOpen && (
+          <div className="modal-overlay" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })} style={{ zIndex: 60 }}>
+            <div 
+              className="modal-content" 
+              style={{ maxWidth: '400px' }} 
+              onClick={(e) => e.stopPropagation()}
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="confirm-dialog-title"
+              aria-describedby="confirm-dialog-desc"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 id="confirm-dialog-title" className="text-lg font-bold text-gray-800">Confirm Action</h2>
+                <button onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+              </div>
+              <div className="space-y-4">
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <p id="confirm-dialog-desc" className="text-sm font-medium text-amber-700">This will update the inventory count immediately. Continue?</p>
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+                  <button type="button" className="btn btn-secondary" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })}>Cancel</button>
+                  <button type="button" className="btn btn-primary bg-indigo-600 border border-indigo-600 hover:bg-indigo-700 text-white" autoFocus onClick={() => confirmDialog.onConfirm && confirmDialog.onConfirm()}>Confirm</button>
+                </div>
               </div>
             </div>
           </div>
