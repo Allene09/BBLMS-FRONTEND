@@ -5,8 +5,8 @@ import api from '../services/api';
 import {
   PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiCalendarCheck as FiCalendar,
   PiChartBar as FiBarChart2, PiShieldCheck as FiShield, PiList as FiMenu, PiX as FiX, PiCheck as FiCheck,
-  PiArrowRight as FiArrowRight, PiEnvelopeSimple as FiMail, PiPhone as FiPhone, PiMapPin as FiMapPin, PiClock as FiClock,
-  PiTrendUp as FiTrendingUp, PiDatabase as FiDatabase, PiGlobe as FiGlobe, PiStar as FiStar,
+  PiArrowRight as FiArrowRight, PiEnvelopeSimple as FiMail, PiPhone as FiPhone, PiMapPin as FiMapPin,
+  PiTrendUp as FiTrendingUp, PiStar as FiStar,
   PiMagnifyingGlass as FiSearch, PiCaretDown,
 } from 'react-icons/pi';
 
@@ -62,10 +62,10 @@ const features = [
 ];
 
 const stats = [
-  { key: 'totalBooks',     label: 'Books Catalogued',  icon: FiBook },
-  { key: 'totalBorrowers', label: 'Active Borrowers',   icon: FiUsers },
-  { value: '99.9%',        label: 'System Uptime',      icon: FiTrendingUp },
-  { value: '100%',         label: 'Made for BISU',      icon: FiStar },
+  { key: 'totalBooks', label: 'Books Catalogued', icon: FiBook },
+  { key: 'totalBorrowers', label: 'Active Borrowers', icon: FiUsers },
+  { value: '99.9%', label: 'System Uptime', icon: FiTrendingUp },
+  { value: '100%', label: 'Made for BISU', icon: FiStar },
 ];
 
 const steps = [
@@ -141,15 +141,15 @@ export default function LandingPage() {
   const handleViewDetails = (book) => {
     setSelectedBook(book);
   };
-  const [featRef,  featVisible]  = useInView();
+  const [featRef, featVisible] = useInView();
   const [statsRef, statsVisible] = useInView();
   const [stepsRef, stepsVisible] = useInView();
-  const [aboutRef, aboutVisible] = useInView();
-  const [ctaRef,   ctaVisible]   = useInView();
+  const [servicesRef, servicesVisible] = useInView();
+  const [ctaRef, ctaVisible] = useInView();
   const [liveStats, setLiveStats] = useState(null);
 
   useEffect(() => {
-    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
+    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -198,11 +198,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
 
       {/* ── Navbar ── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
           ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
           : 'bg-transparent'
-      }`}>
+        }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -220,15 +219,14 @@ export default function LandingPage() {
 
             {/* Desktop links + compact search */}
             <div className="hidden md:flex items-center gap-6">
-              {['#', '#features', '#how-it-works', '#about'].map((href, i) => (
+              {['#', '#features', '#how-it-works', '#services'].map((href, i) => (
                 <a
                   key={href}
                   href={href}
-                  className={`text-sm font-medium transition-colors ${
-                    scrolled ? 'text-gray-600 hover:text-blue-600' : 'text-blue-100 hover:text-white'
-                  }`}
+                  className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-600 hover:text-blue-600' : 'text-blue-100 hover:text-white'
+                    }`}
                 >
-                  {['Home', 'Features', 'How It Works', 'About'][i]}
+                  {['Home', 'Features', 'How It Works', 'Services'][i]}
                 </a>
               ))}
 
@@ -237,11 +235,10 @@ export default function LandingPage() {
                   <div className="relative" ref={categoryDropdownRef}>
                     <button
                       onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                      className={`w-36 flex items-center justify-between rounded-lg border px-2.5 py-2 text-xs outline-none transition ${
-                        scrolled 
-                          ? 'bg-white/70 backdrop-blur-md text-gray-700 border-gray-200/60 shadow-sm hover:bg-white/90' 
+                      className={`w-36 flex items-center justify-between rounded-lg border px-2.5 py-2 text-xs outline-none transition ${scrolled
+                          ? 'bg-white/70 backdrop-blur-md text-gray-700 border-gray-200/60 shadow-sm hover:bg-white/90'
                           : 'bg-white/10 backdrop-blur-md text-blue-50 border-white/20 hover:bg-white/20'
-                      }`}
+                        }`}
                     >
                       <span className="truncate">
                         {selectedCategory === 'all' ? 'All Categories' : selectedCategory}
@@ -250,43 +247,40 @@ export default function LandingPage() {
                     </button>
 
                     {categoryDropdownOpen && (
-                      <div className={`absolute left-0 top-[110%] w-48 rounded-xl border shadow-2xl z-50 overflow-hidden backdrop-blur-xl transition-all ${
-                        scrolled 
-                          ? 'bg-white/80 border-white/60 text-gray-700 shadow-gray-200/50' 
+                      <div className={`absolute left-0 top-[110%] w-48 rounded-xl border shadow-2xl z-50 overflow-hidden backdrop-blur-xl transition-all ${scrolled
+                          ? 'bg-white/80 border-white/60 text-gray-700 shadow-gray-200/50'
                           : 'bg-slate-900/60 border-white/10 text-white shadow-black/50'
-                      }`}>
+                        }`}>
                         <div className="max-h-64 overflow-y-auto py-1 custom-scrollbar">
-                           <button
-                             onClick={() => {
-                               setSelectedCategory('all');
-                               setSearchTouched(true);
-                               setCategoryDropdownOpen(false);
-                             }}
-                             className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${
-                               selectedCategory === 'all' 
-                                 ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
-                                 : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
-                             }`}
-                           >
-                             All Categories
-                           </button>
-                           {availableCategories.map((category) => (
-                             <button
-                               key={category}
-                               onClick={() => {
-                                 setSelectedCategory(category);
-                                 setSearchTouched(true);
-                                 setCategoryDropdownOpen(false);
-                               }}
-                               className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${
-                                 selectedCategory === category
-                                   ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
-                                   : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
-                               }`}
-                             >
-                               {category}
-                             </button>
-                           ))}
+                          <button
+                            onClick={() => {
+                              setSelectedCategory('all');
+                              setSearchTouched(true);
+                              setCategoryDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${selectedCategory === 'all'
+                                ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
+                                : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
+                              }`}
+                          >
+                            All Categories
+                          </button>
+                          {availableCategories.map((category) => (
+                            <button
+                              key={category}
+                              onClick={() => {
+                                setSelectedCategory(category);
+                                setSearchTouched(true);
+                                setCategoryDropdownOpen(false);
+                              }}
+                              className={`w-full text-left px-3 py-2.5 text-xs transition-colors ${selectedCategory === category
+                                  ? (scrolled ? 'bg-blue-50/80 text-blue-700 font-bold' : 'bg-blue-500/40 text-white font-bold')
+                                  : (scrolled ? 'hover:bg-gray-100/80 font-medium' : 'hover:bg-white/10 text-blue-100 font-medium')
+                                }`}
+                            >
+                              {category}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -294,9 +288,8 @@ export default function LandingPage() {
 
                   <div className="relative flex-1">
                     <FiSearch
-                      className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${
-                        scrolled ? 'text-gray-400' : 'text-blue-200'
-                      }`}
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${scrolled ? 'text-gray-400' : 'text-blue-200'
+                        }`}
                       size={14}
                     />
                     <input
@@ -307,9 +300,8 @@ export default function LandingPage() {
                         setSearchTouched(true);
                       }}
                       placeholder="Search books"
-                      className={`w-full rounded-lg border pl-9 pr-3 py-2 text-xs outline-none transition ${
-                        scrolled ? 'bg-white text-gray-800 border-gray-200' : 'bg-white/10 text-white border-white/20'
-                      }`}
+                      className={`w-full rounded-lg border pl-9 pr-3 py-2 text-xs outline-none transition ${scrolled ? 'bg-white text-gray-800 border-gray-200' : 'bg-white/10 text-white border-white/20'
+                        }`}
                     />
                   </div>
                 </div>
@@ -329,11 +321,10 @@ export default function LandingPage() {
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           <button
                             onClick={() => handleViewDetails(book)}
-                            className={`px-2.5 py-1.5 text-[10px] rounded border font-semibold transition ${
-                              scrolled
+                            className={`px-2.5 py-1.5 text-[10px] rounded border font-semibold transition ${scrolled
                                 ? 'text-blue-700 border-blue-200 bg-blue-50 hover:bg-blue-100'
                                 : 'text-blue-100 border-blue-300/50 bg-blue-500/20 hover:bg-blue-500/30'
-                            }`}
+                              }`}
                           >
                             View Details
                           </button>
@@ -380,14 +371,14 @@ export default function LandingPage() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-1 shadow-xl">
-            {['#', '#features', '#how-it-works', '#about'].map((href, i) => (
+            {['#', '#features', '#how-it-works', '#services'].map((href, i) => (
               <a
                 key={href}
                 href={href}
                 className="block text-sm text-gray-700 py-2.5 font-medium"
                 onClick={() => setMenuOpen(false)}
               >
-                {['Home', 'Features', 'How It Works', 'About'][i]}
+                {['Home', 'Features', 'How It Works', 'Services'][i]}
               </a>
             ))}
             <div className="pt-2 border-t border-gray-100 mt-2">
@@ -474,9 +465,9 @@ export default function LandingPage() {
               {/* Mini stats */}
               <div className="flex flex-wrap gap-8 anim-fade-up d-400">
                 {[
-                  { icon: FiBook,       label: 'Books Tracked', value: liveStats ? Number(liveStats.totalBooks).toLocaleString()     : '…' },
-                  { icon: FiUsers,      label: 'Borrowers',     value: liveStats ? Number(liveStats.totalBorrowers).toLocaleString() : '…' },
-                  { icon: FiTrendingUp, label: 'Active Loans',  value: liveStats ? Number(liveStats.activeLoans).toLocaleString()    : '…' },
+                  { icon: FiBook, label: 'Books Tracked', value: liveStats ? Number(liveStats.totalBooks).toLocaleString() : '…' },
+                  { icon: FiUsers, label: 'Borrowers', value: liveStats ? Number(liveStats.totalBorrowers).toLocaleString() : '…' },
+                  { icon: FiTrendingUp, label: 'Active Loans', value: liveStats ? Number(liveStats.activeLoans).toLocaleString() : '…' },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.15)' }}>
@@ -690,30 +681,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── About ── */}
-      <section id="about" className="py-24 bg-white" ref={aboutRef}>
+      {/* ── Services ── */}
+      <section id="services" className="py-24 bg-white" ref={servicesRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className={aboutVisible ? 'anim-fade-left' : 'opacity-0'}>
+            <div className={servicesVisible ? 'anim-fade-left' : 'opacity-0'}>
               <span className="inline-block text-blue-600 text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full bg-blue-50">
-                About
+                Services
               </span>
               <h2 className="text-4xl font-extrabold text-gray-900 mb-6 tracking-tight">
-                Built for BISU<br />Bilar Campus
+                Everything the Library<br />Needs, In One System
               </h2>
               <p className="text-gray-500 leading-relaxed mb-5">
-                The BISU Bilar Library Management System is purpose-built for the Bohol Island State University - Bilar Campus, designed to replace manual processes with a streamlined digital solution tailored to the campus community.
+                The BISU Bilar Library Management System delivers a full suite of services that cover the entire lifecycle of a library item — from the moment it's catalogued to the moment it's returned.
               </p>
               <p className="text-gray-500 leading-relaxed mb-8">
-                Our system supports multiple user roles — Administrators, Librarians, Faculty, and Students — each with tailored access and functionality to meet their specific needs.
+                These services support Administrators, Librarians, Faculty, and Students alike, giving every role the tools they need to manage the collection and borrowing process efficiently.
               </p>
               <div className="space-y-3">
                 {[
-                  'Barcode scanner integration for fast, accurate transactions',
-                  'Automated fine calculation for overdue items',
-                  'Complete audit trail of all library transactions',
-                  'Multi-role access with granular permission control',
-                  'Supplier management and acquisition tracking',
+                  'Book cataloging, classification, and inventory tracking',
+                  'Borrower registration and profile management',
+                  'Checkout and check-in processing with barcode scanning',
+                  'Reservation and hold-request handling',
+                  'Overdue monitoring with automated fine computation',
+                  'Circulation reports and usage analytics',
+                  'Supplier coordination and acquisition tracking',
+                  'User account and access-level administration',
                 ].map((f) => (
                   <div key={f} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -725,13 +719,13 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className={`rounded-3xl p-10 border border-blue-100 ${aboutVisible ? 'anim-fade-right d-200' : 'opacity-0'}`} style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
+            <div className={`rounded-3xl p-10 border border-blue-100 ${servicesVisible ? 'anim-fade-right d-200' : 'opacity-0'}`} style={{ background: 'linear-gradient(135deg, #eff6ff, #eef2ff)' }}>
               <div className="space-y-6">
                 {[
-                  { icon: FiDatabase, title: 'Centralized Database', desc: 'All library data in one secure SQLite database with full backup capability and zero reliance on external servers.' },
-                  { icon: FiGlobe, title: 'Web-Based Platform', desc: 'Access from any browser — no installation required. Works seamlessly on desktop and mobile devices.' },
-                  { icon: FiShield, title: 'Secure & Reliable', desc: 'JWT authentication, role-based access control, and industry-standard credential storage protect your data.' },
-                  { icon: FiClock, title: 'Real-Time Updates', desc: 'Live tracking of book availability, borrower status, and transaction history keeps everything in sync.' },
+                  { icon: FiBook, title: 'Catalog & Inventory Services', desc: 'Cataloging, barcode-based lookup, and real-time availability tracking for the entire collection.' },
+                  { icon: FiUsers, title: 'Borrower Services', desc: 'Registration and management of Student, Faculty, and Staff accounts with complete loan history.' },
+                  { icon: FiCalendar, title: 'Reservation Services', desc: 'Advance booking of library items with automatic expiry once a reservation window has passed.' },
+                  { icon: FiBarChart2, title: 'Reporting & Analytics Services', desc: 'On-demand reports covering circulation trends, overdue items, and overall collection usage.' },
                 ].map(({ icon: Icon, title, desc }) => (
                   <div key={title} className="flex gap-4">
                     <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0 border border-blue-100">
@@ -807,7 +801,7 @@ export default function LandingPage() {
                 {[
                   { href: '#features', label: 'Features' },
                   { href: '#how-it-works', label: 'How It Works' },
-                  { href: '#about', label: 'About' },
+                  { href: '#services', label: 'Services' },
                   { href: '/login', label: 'Staff Portal', isLink: true },
                 ].map(({ href, label, isLink }) =>
                   isLink ? (

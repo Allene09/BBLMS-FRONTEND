@@ -4,7 +4,7 @@ import {
   PiHouseSimple as FiHome, PiBooks as FiBook, PiUsersThree as FiUsers, PiTruck as FiTruck, PiSignOut as FiLogOut,
   PiArrowCircleRight as FiArrowRightCircle, PiArrowCircleLeft as FiArrowLeftCircle, PiCalendarCheck as FiCalendar,
   PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight, PiWarning as FiWarning,
-  PiReceipt as FiReceipt, PiChartBar as FiChartBar, PiUserCircle as FiProfile,
+  PiReceipt as FiReceipt, PiChartBar as FiChartBar, PiUserCircle as FiProfile, PiBookOpenText as FiMyBorrows,
 } from 'react-icons/pi';
 import { useState } from 'react';
 
@@ -20,6 +20,7 @@ const navItems = [
   { path: '/app/reports',   icon: FiChartBar,         label: 'Reports',              roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
   { path: '/app/reservations', icon: FiCalendar,  label: 'Reservations',            roles: ['LIBRARIAN'] },
   { path: '/app/profile',   icon: FiProfile,        label: 'Profile',                roles: [] },
+  { path: '/app/my-borrows', icon: FiMyBorrows,      label: 'My Borrows',             roles: ['STUDENT', 'BORROWER'] },
   { path: '/app/users',     icon: FiSettings,     label: 'System Users',             roles: ['ADMIN', 'ADMINISTRATOR'] },
 ];
 
