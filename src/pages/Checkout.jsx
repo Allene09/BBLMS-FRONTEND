@@ -7,10 +7,14 @@ const emptyBorrowerForm = {
   id_no: '',
   firstname: '',
   lastname: '',
-  contact_number: '',
-  department: '',
+  password: '',
+  confirm_password: '',
+  mobile_phone: '',
+  phone: '',
+  email: '',
+  address: '',
+  notes: '',
   type: 'Student',
-  status: 'Active',
 };
 
 export default function Checkout() {
@@ -116,9 +120,18 @@ export default function Checkout() {
     if (!borrowerForm.firstname.trim()) errors.firstname = 'First name is required';
     if (!borrowerForm.lastname.trim()) errors.lastname = 'Last name is required';
 
-    const contactDigits = borrowerForm.contact_number.replace(/\D/g, '');
-    if (contactDigits.length !== 11) {
-      errors.contact_number = 'Contact number must be exactly 11 digits';
+    if (!borrowerForm.password) {
+      errors.password = 'Password is required';
+    } else if (borrowerForm.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    if (borrowerForm.password !== borrowerForm.confirm_password) {
+      errors.confirm_password = 'Passwords do not match';
+    }
+
+    const mobileDigits = borrowerForm.mobile_phone.replace(/\D/g, '');
+    if (borrowerForm.mobile_phone && mobileDigits.length !== 11) {
+      errors.mobile_phone = 'Mobile number must be exactly 11 digits';
     }
 
     setRegisterErrors(errors);
@@ -134,16 +147,25 @@ export default function Checkout() {
         id_no: borrowerForm.id_no.trim(),
         firstname: borrowerForm.firstname.trim(),
         lastname: borrowerForm.lastname.trim(),
-        mobile_phone: borrowerForm.contact_number.replace(/\D/g, ''),
-        notes: borrowerForm.department.trim() ? `Department: ${borrowerForm.department.trim()}` : null,
+        password: borrowerForm.password,
+        mobile_phone: borrowerForm.mobile_phone.replace(/\D/g, ''),
+        phone: borrowerForm.phone.trim(),
+        email: borrowerForm.email.trim(),
+        address: borrowerForm.address.trim(),
+        notes: borrowerForm.notes.trim() || null,
         type: borrowerForm.type,
-        status: 'Active',
       };
 
-      const res = await api.post('/borrowers', payload);
-      const created = res.data;
+      const res = await api.post('/auth/signup', payload);
+      const created = {
+        id: res.data?.user_id || payload.id_no,
+        id_no: payload.id_no,
+        firstname: payload.firstname,
+        lastname: payload.lastname,
+        type: payload.type,
+      };
 
-      toast.success('Borrower registered successfully');
+      toast.success('Borrower account created and sent for admin approval');
       setSelectedBorrower(created);
       setBorrowerSearch(created.id_no);
       setShowRegisterModal(false);
@@ -487,12 +509,12 @@ export default function Checkout() {
         <div className="modal-overlay" onClick={() => setShowRegisterModal(false)}>
           <div className="modal-content" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-bold text-gray-800">Register New Borrower</h2>
+              <h2 className="text-lg font-bold text-gray-800">Create Borrower Account</h2>
               <button onClick={() => setShowRegisterModal(false)} className="text-gray-400 hover:text-gray-600">
                 <FiX size={20} />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-4">Complete required fields to add a borrower and auto-select them for checkout.</p>
+            <p className="text-xs text-gray-500 mb-4">Create the borrower login account and profile here. The account will follow the approval flow.</p>
 
             <form onSubmit={handleRegisterBorrower} className="space-y-4">
               {registerFormError && (
@@ -560,30 +582,89 @@ export default function Checkout() {
                   {registerErrors.lastname && <p className="text-xs text-red-500 mt-1">{registerErrors.lastname}</p>}
                 </div>
                 <div>
-                  <label className="form-label">Contact Number *</label>
+                  <label className="form-label">Password *</label>
                   <input
-                    className={`form-input ${registerErrors.contact_number ? 'border-red-400 focus:border-red-500' : ''}`}
-                    value={borrowerForm.contact_number}
+                    type="password"
+                    className={`form-input ${registerErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
+                    value={borrowerForm.password}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setBorrowerForm((prev) => ({ ...prev, password: value }));
+                      setRegisterErrors((prev) => ({ ...prev, password: undefined }));
+                      setRegisterFormError('');
+                    }}
+                    required
+                  />
+                  {registerErrors.password && <p className="text-xs text-red-500 mt-1">{registerErrors.password}</p>}
+                </div>
+                <div>
+                  <label className="form-label">Confirm Password *</label>
+                  <input
+                    type="password"
+                    className={`form-input ${registerErrors.confirm_password ? 'border-red-400 focus:border-red-500' : ''}`}
+                    value={borrowerForm.confirm_password}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setBorrowerForm((prev) => ({ ...prev, confirm_password: value }));
+                      setRegisterErrors((prev) => ({ ...prev, confirm_password: undefined }));
+                      setRegisterFormError('');
+                    }}
+                    required
+                  />
+                  {registerErrors.confirm_password && <p className="text-xs text-red-500 mt-1">{registerErrors.confirm_password}</p>}
+                </div>
+                <div>
+                  <label className="form-label">Mobile Phone</label>
+                  <input
+                    className={`form-input ${registerErrors.mobile_phone ? 'border-red-400 focus:border-red-500' : ''}`}
+                    value={borrowerForm.mobile_phone}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '').slice(0, 11);
-                      setBorrowerForm((prev) => ({ ...prev, contact_number: value }));
-                      setRegisterErrors((prev) => ({ ...prev, contact_number: undefined }));
+                      setBorrowerForm((prev) => ({ ...prev, mobile_phone: value }));
+                      setRegisterErrors((prev) => ({ ...prev, mobile_phone: undefined }));
                       setRegisterFormError('');
                     }}
                     placeholder="09XXXXXXXXX"
                     inputMode="numeric"
                     maxLength={11}
-                    required
                   />
-                  {registerErrors.contact_number && <p className="text-xs text-red-500 mt-1">{registerErrors.contact_number}</p>}
+                  {registerErrors.mobile_phone && <p className="text-xs text-red-500 mt-1">{registerErrors.mobile_phone}</p>}
                 </div>
                 <div>
-                  <label className="form-label">College</label>
+                  <label className="form-label">Phone</label>
                   <input
                     className="form-input"
-                    value={borrowerForm.department}
-                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, department: e.target.value }))}
-                    placeholder="e.g. College of Education"
+                    value={borrowerForm.phone}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Landline (optional)"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={borrowerForm.email}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, email: e.target.value }))}
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="form-label">Address</label>
+                  <input
+                    className="form-input"
+                    value={borrowerForm.address}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, address: e.target.value }))}
+                    placeholder="Complete address"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="form-label">Notes</label>
+                  <input
+                    className="form-input"
+                    value={borrowerForm.notes}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Optional notes"
                   />
                 </div>
               </div>
@@ -593,7 +674,7 @@ export default function Checkout() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={registering}>
-                  <FiCheck size={16} /> {registering ? 'Registering...' : 'Register Borrower'}
+                  <FiCheck size={16} /> {registering ? 'Creating Account...' : 'Create Borrower Account'}
                 </button>
               </div>
             </form>

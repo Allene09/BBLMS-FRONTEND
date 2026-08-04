@@ -39,7 +39,7 @@ const FloatingParticles = () => (
 );
 
 export default function Login() {
-  const selfSignupEnabled = false;
+  const selfSignupEnabled = true;
   const { user, login, showTransition } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,7 +131,7 @@ export default function Login() {
     setSignupLoading(true);
     try {
       await api.post('/auth/signup', signupForm);
-      toast.success('Account created successfully! You can now sign in.');
+      toast.success('Account created. Wait for admin approval, then sign in.');
       setShowSignup(false);
       setSignupForm({ ...emptySignup });
       setUserId(signupForm.id_no); // Pre-fill login with new ID

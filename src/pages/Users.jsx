@@ -10,10 +10,12 @@ const emptyUser = {
 
 export default function Users() {
   const [users, setUsers] = useState([]);
+  const [pendingSignups, setPendingSignups] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ ...emptyUser });
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reviewingId, setReviewingId] = useState(null);
 
   // Borrow book states
   const [showBorrowModal, setShowBorrowModal] = useState(false);
@@ -41,7 +43,17 @@ export default function Users() {
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  const fetchPendingSignups = async () => {
+    try {
+      const res = await api.get('/users/pending-signups');
+      setPendingSignups(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      if (err.response?.status === 403) toast.error('Admin access required');
+      else toast.error('Failed to load pending signups');
+    }
+  };
+
+  useEffect(() => { fetchUsers(); fetchPendingSignups(); }, []);
 
   // Set default due date (3 days from now)
   useEffect(() => {
@@ -79,6 +91,38 @@ export default function Users() {
   };
 
   const handleChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+
+  const refreshAccounts = async () => {
+    await Promise.all([fetchUsers(), fetchPendingSignups()]);
+  };
+
+  const handleReviewSignup = async (user, action) => {
+    setReviewingId(user.id);
+    try {
+      await api.patch(`/users/${user.id}/${action}`);
+      toast.success(action === 'approve' ? 'Signup approved' : 'Signup denied');
+      await refreshAccounts();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Review action failed');
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  const statusStyles = {
+    APPROVED: 'bg-emerald-100/70 text-emerald-700 border-emerald-200/70',
+    PENDING: 'bg-amber-100/70 text-amber-700 border-amber-200/70',
+    DENIED: 'bg-rose-100/70 text-rose-700 border-rose-200/70',
+  };
+
+  const renderStatusBadge = (status) => {
+    const normalized = String(status || 'APPROVED').toUpperCase();
+    return (
+      <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur-sm border ${statusStyles[normalized] || statusStyles.APPROVED}`}>
+        {normalized}
+      </span>
+    );
+  };
 
   // Borrow book handlers
   const handleBorrowClick = async (user) => {
@@ -191,6 +235,71 @@ export default function Users() {
         </button>
       </div>
 
+      {pendingSignups.length > 0 && (
+        <div className="mb-8 bg-white/50 backdrop-blur-2xl rounded-[2rem] border border-amber-200/60 shadow-[0_8px_40px_rgb(0,0,0,0.05)] overflow-hidden relative z-10">
+          <div className="p-6 lg:p-7 border-b border-amber-100/70 bg-gradient-to-r from-amber-50/80 to-white/60">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-black text-amber-950 tracking-tight">Pending Borrower Signups</h2>
+                <p className="text-sm font-semibold text-amber-800/70 mt-1">Review new borrower accounts before they can sign in.</p>
+              </div>
+              <span className="inline-flex items-center justify-center px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.16em] bg-amber-100/80 text-amber-700 border border-amber-200/80">
+                {pendingSignups.length} awaiting review
+              </span>
+            </div>
+          </div>
+          <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {pendingSignups.map((signup) => {
+              const fullName = [signup.firstname, signup.lastname].filter(Boolean).join(' ') || signup.username || 'Unnamed Borrower';
+              return (
+                <div key={signup.id} className="rounded-[1.5rem] border border-white/80 bg-white/80 shadow-sm p-5 flex flex-col gap-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-1">Borrower Account</p>
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">{fullName}</h3>
+                      <p className="text-xs font-bold text-slate-500 mt-1">ID No: {signup.user_id}</p>
+                    </div>
+                    {renderStatusBadge(signup.status)}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Contact</p>
+                      <p className="font-bold text-slate-700 mt-1">{signup.mobile_phone || signup.phone || '—'}</p>
+                      <p className="text-xs text-slate-500">{signup.email || 'No email provided'}</p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Borrower Type</p>
+                      <p className="font-bold text-slate-700 mt-1">{signup.borrower_type || 'Student'}</p>
+                      <p className="text-xs text-slate-500">{signup.address || 'No address provided'}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleReviewSignup(signup, 'deny')}
+                      disabled={reviewingId === signup.id}
+                      className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-[11px] uppercase tracking-wider transition-all border border-rose-200/70 disabled:opacity-50"
+                    >
+                      Deny
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleReviewSignup(signup, 'approve')}
+                      disabled={reviewingId === signup.id}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.25)] disabled:opacity-50"
+                    >
+                      Approve
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Main Table */}
       <div className="bg-white/30 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
@@ -201,20 +310,21 @@ export default function Users() {
                 <th className="p-5 pl-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Identity</th>
                 <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Role / Designation</th>
                 <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Access Right</th>
+                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Account Status</th>
                 <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">System Admin</th>
                 <th className="p-5 pr-8 text-right text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/30">
               {users.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-16">
+                <tr><td colSpan={6} className="text-center py-16">
                    <div className="flex flex-col items-center justify-center text-slate-400">
                     <FiSearch size={32} className="mb-4 opacity-50 block mx-auto" />
                     <p className="font-black text-sm">No system users assigned.</p>
                   </div>
                 </td></tr>
               ) : users.map((u) => (
-                <tr key={u.id} className="hover:bg-white/40 transition-colors group cursor-default">
+                <tr key={u.id} className={`hover:bg-white/40 transition-colors group cursor-default ${String(u.status || '').toUpperCase() === 'PENDING' ? 'bg-amber-50/40' : ''}`}>
                   <td className="p-4 pl-8">
                     <p className="font-bold text-sm text-slate-800">{u.username}</p>
                     <p className="text-[10px] text-indigo-500 font-black">ID: {u.user_id}</p>
@@ -226,6 +336,9 @@ export default function Users() {
                     <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur-sm border bg-emerald-100/60 text-emerald-700 border-emerald-200/50">
                       {u.access_right}
                     </span>
+                  </td>
+                  <td className="p-4 text-center">
+                    {renderStatusBadge(u.status)}
                   </td>
                   <td className="p-4 text-center">
                     {u.is_admin ? (

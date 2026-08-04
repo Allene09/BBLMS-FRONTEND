@@ -4,13 +4,13 @@ import {
   PiHouseSimple as FiHome, PiBooks as FiBook, PiUsersThree as FiUsers, PiTruck as FiTruck, PiSignOut as FiLogOut,
   PiArrowCircleRight as FiArrowRightCircle, PiArrowCircleLeft as FiArrowLeftCircle, PiCalendarCheck as FiCalendar,
   PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight, PiWarning as FiWarning,
-  PiReceipt as FiReceipt, PiChartBar as FiChartBar,
+  PiReceipt as FiReceipt, PiChartBar as FiChartBar, PiUserCircle as FiProfile,
 } from 'react-icons/pi';
 import { useState } from 'react';
 
 const navItems = [
   { path: '/app',       icon: FiHome,             label: 'Dashboard',    end: true,  roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
-  { path: '/app/books', icon: FiBook,             label: 'Library Items',            roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN', 'STAFF'] },
+  { path: '/app/books', icon: FiBook,             label: 'Library Items',            roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN', 'STAFF', 'STUDENT', 'BORROWER'] },
   { path: '/app/borrowers', icon: FiUsers,         label: 'Borrowers',               roles: ['LIBRARIAN'] },
   { path: '/app/suppliers', icon: FiTruck,         label: 'Suppliers',               roles: ['STAFF'] },
   { path: '/app/checkout',  icon: FiArrowRightCircle, label: 'Borrow Book',          roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
@@ -19,6 +19,7 @@ const navItems = [
   { path: '/app/records',   icon: FiReceipt,          label: 'Borrow Records',       roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
   { path: '/app/reports',   icon: FiChartBar,         label: 'Reports',              roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
   { path: '/app/reservations', icon: FiCalendar,  label: 'Reservations',            roles: ['LIBRARIAN'] },
+  { path: '/app/profile',   icon: FiProfile,        label: 'Profile',                roles: [] },
   { path: '/app/users',     icon: FiSettings,     label: 'System Users',             roles: ['ADMIN', 'ADMINISTRATOR'] },
 ];
 
@@ -32,6 +33,8 @@ const roleColors = {
   LIBRARIAN: 'bg-emerald-500/20 text-emerald-300',
   CIRCULATION_IN_CHARGE: 'bg-amber-500/20 text-amber-300',
   STAFF: 'bg-purple-500/20 text-purple-300',
+  STUDENT: 'bg-cyan-500/20 text-cyan-300',
+  BORROWER: 'bg-cyan-500/20 text-cyan-300',
 };
 
 export default function Layout() {

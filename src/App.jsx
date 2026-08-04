@@ -15,6 +15,7 @@ import BorrowRecords from './pages/BorrowRecords';
 import Reports from './pages/Reports';
 import Reservations from './pages/Reservations';
 import Users from './pages/Users';
+import Profile from './pages/Profile';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -36,6 +37,8 @@ function RoleRoute({ children, roles }) {
   const defaultRouteByRole = {
     CIRCULATION_IN_CHARGE: '/app/checkout',
     STAFF: '/app/books',
+    STUDENT: '/app/books',
+    BORROWER: '/app/books',
   };
 
   if (!user) return <Navigate to="/login" />;
@@ -49,7 +52,7 @@ export default function App() {
   const adminRoles = ['ADMIN', 'ADMINISTRATOR'];
   const adminLibrarianRoles = [...adminRoles, 'LIBRARIAN'];
   const circulationRoles = ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'];
-  const inventoryRoles = [...adminRoles, 'LIBRARIAN', 'STAFF'];
+  const inventoryRoles = [...adminRoles, 'LIBRARIAN', 'STAFF', 'STUDENT', 'BORROWER'];
   const librarianOnlyRoles = ['LIBRARIAN'];
 
   return (
@@ -69,6 +72,7 @@ export default function App() {
         <Route path="records" element={<RoleRoute roles={circulationRoles}><BorrowRecords /></RoleRoute>} />
         <Route path="reports" element={<RoleRoute roles={adminLibrarianRoles}><Reports /></RoleRoute>} />
         <Route path="reservations" element={<RoleRoute roles={librarianOnlyRoles}><Reservations /></RoleRoute>} />
+        <Route path="profile" element={<Profile />} />
         <Route path="users" element={<RoleRoute roles={adminRoles}><Users /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />

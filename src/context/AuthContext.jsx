@@ -28,12 +28,18 @@ export function AuthProvider({ children }) {
       setUser(JSON.parse(savedUser));
       // Verify token is still valid
       api.get('/auth/me').then((res) => {
+        if (String(res.data?.status || 'APPROVED').toUpperCase() !== 'APPROVED') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+          return;
+        }
         setUser(res.data);
         localStorage.setItem('user', JSON.stringify(res.data));
       }).catch((err) => {
         // Only force logout on 401 (invalid/expired token).
         // Network errors or server hiccups should keep the user logged in.
-        if (err.response?.status === 401) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           setUser(null);
@@ -58,8 +64,15 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    const res = await api.get('/auth/me');
+    setUser(res.data);
+    localStorage.setItem('user', JSON.stringify(res.data));
+    return res.data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, transitioning, transitionVariant, showTransition }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser, loading, transitioning, transitionVariant, showTransition }}>
       {children}
     </AuthContext.Provider>
   );
