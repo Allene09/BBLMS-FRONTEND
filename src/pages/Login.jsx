@@ -6,14 +6,14 @@ import api from '../services/api';
 import { PiSignIn as FiLogIn, PiBooks as FiBook, PiUsersThree as FiUsers, PiArrowCircleRight as FiArrowRightCircle, PiCalendarCheck as FiCalendar, PiArrowLeft as FiArrowLeft, PiEye as FiEye, PiEyeSlash as FiEyeOff, PiShieldCheck as FiShield, PiClock as FiClock, PiLightning as FiZap, PiUserPlus as FiUserPlus, PiX as FiX, PiCheck as FiCheck } from 'react-icons/pi';
 
 const highlights = [
-  { icon: FiBook,             text: 'Manage your entire book catalog with ease', color: '#60a5fa' },
-  { icon: FiUsers,            text: 'Track borrowers and their loan history', color: '#34d399' },
+  { icon: FiBook, text: 'Manage your entire book catalog with ease', color: '#60a5fa' },
+  { icon: FiUsers, text: 'Track borrowers and their loan history', color: '#34d399' },
   { icon: FiArrowRightCircle, text: 'Process checkouts and returns instantly', color: '#f472b6' },
-  { icon: FiCalendar,         text: 'Manage reservations and fine collections', color: '#fbbf24' },
+  { icon: FiCalendar, text: 'Manage reservations and fine collections', color: '#fbbf24' },
 ];
 
 const emptySignup = {
-  id_no: '', firstname: '', lastname: '', password: '', confirm_password: '',
+  id_no: '', firstname: '', middle_name: '', lastname: '', gender: 'Male', college: 'CTECH', password: '', confirm_password: '',
   mobile_phone: '', phone: '', email: '', address: '', notes: '', type: 'STUDENT'
 };
 
@@ -59,16 +59,16 @@ export default function Login() {
   const [showSignupPw, setShowSignupPw] = useState(false);
 
   const stats = [
-    { icon: FiBook,  key: 'totalBooks',     label: 'Books' },
+    { icon: FiBook, key: 'totalBooks', label: 'Books' },
     { icon: FiUsers, key: 'totalBorrowers', label: 'Users' },
-    { icon: FiZap,   value: '99.9%',        label: 'Uptime' },
+    { icon: FiZap, value: '99.9%', label: 'Uptime' },
   ];
 
   const [liveStats, setLiveStats] = useState(null);
 
   useEffect(() => {
     setMounted(true);
-    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => {});
+    api.get('/stats').then(r => setLiveStats(r.data)).catch(() => { });
   }, []);
 
   if (user) {
@@ -94,8 +94,8 @@ export default function Login() {
       const dest = hasBorrowIntent
         ? '/app/books'
         : (role === 'CIRCULATION_IN_CHARGE'
-            ? '/app/checkout'
-            : (['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books'));
+          ? '/app/checkout'
+          : (['ADMIN', 'LIBRARIAN'].includes(role) ? '/app' : '/app/books'));
       await showTransition('login', 3000);
       navigate(
         dest,
@@ -116,7 +116,7 @@ export default function Login() {
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!signupForm.id_no || !signupForm.firstname || !signupForm.lastname || !signupForm.password) {
       return toast.error('Please fill in all required fields');
@@ -159,10 +159,10 @@ export default function Login() {
           `,
           animation: 'pulse 8s ease-in-out infinite',
         }} />
-        
+
         {/* Floating particles */}
         <FloatingParticles />
-        
+
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-[0.04]" style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -196,7 +196,7 @@ export default function Login() {
               WebkitTextFillColor: 'transparent',
               animation: 'shimmer 3s linear infinite',
             }}>
-              Management 
+              Management
               System.
             </span>
           </h2>
@@ -225,16 +225,16 @@ export default function Login() {
 
           <div className="space-y-3">
             {highlights.map(({ icon: Icon, text, color }, idx) => (
-              <div 
-                key={text} 
+              <div
+                key={text}
                 className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-300 hover:translate-x-2 cursor-default group`}
-                style={{ 
+                style={{
                   background: 'rgba(255,255,255,0.03)',
                   border: '1px solid rgba(255,255,255,0.05)',
                 }}
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110"
-                  style={{ 
+                  style={{
                     background: `${color}15`,
                     border: `1px solid ${color}30`,
                     boxShadow: `0 4px 16px ${color}20`
@@ -332,7 +332,7 @@ export default function Login() {
               type="submit"
               disabled={loading}
               className="w-full py-4 px-6 text-white font-semibold text-base rounded-xl transition-all duration-300 flex items-center justify-center gap-2 mt-4 group"
-              style={{ 
+              style={{
                 background: loading ? '#94a3b8' : 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
                 boxShadow: loading ? 'none' : '0 8px 24px rgba(37,99,235,0.35)',
               }}
@@ -379,7 +379,7 @@ export default function Login() {
       {/* Sign Up Modal */}
       {selfSignupEnabled && showSignup && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowSignup(false)}>
-          <div 
+          <div
             className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-100"
             onClick={(e) => e.stopPropagation()}
             style={{ animation: 'modalSlideIn 0.25s ease-out' }}
@@ -390,7 +390,7 @@ export default function Login() {
                 <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
                 <p className="text-sm text-gray-500 mt-0.5">Fill in your information to register</p>
               </div>
-              <button 
+              <button
                 onClick={() => setShowSignup(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-50 rounded-lg"
               >
@@ -463,7 +463,7 @@ export default function Login() {
                   Personal Information
                 </h3>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Firstname <span className="text-red-400">*</span></label>
                       <input
@@ -476,6 +476,16 @@ export default function Login() {
                       />
                     </div>
                     <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Middle Name</label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Enter middle name"
+                        value={signupForm.middle_name}
+                        onChange={(e) => handleSignupChange('middle_name', e.target.value)}
+                      />
+                    </div>
+                    <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Lastname <span className="text-red-400">*</span></label>
                       <input
                         type="text"
@@ -485,6 +495,38 @@ export default function Login() {
                         onChange={(e) => handleSignupChange('lastname', e.target.value)}
                         required
                       />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Gender <span className="text-red-400">*</span></label>
+                      <select
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50 appearance-none cursor-pointer"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+                        value={signupForm.gender}
+                        onChange={(e) => handleSignupChange('gender', e.target.value)}
+                        required
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">College <span className="text-red-400">*</span></label>
+                      <select
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50 appearance-none cursor-pointer"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
+                        value={signupForm.college}
+                        onChange={(e) => handleSignupChange('college', e.target.value)}
+                        required
+                      >
+                        <option value="CTECH">CTECH</option>
+                        <option value="CFES">CFES</option>
+                        <option value="CBM">CBM</option>
+                        <option value="COAS">COAS</option>
+                        <option value="CTE">CTE</option>
+                      </select>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -569,7 +611,7 @@ export default function Login() {
                   type="submit"
                   disabled={signupLoading}
                   className="flex-1 py-3 px-6 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  style={{ 
+                  style={{
                     background: signupLoading ? '#94a3b8' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     boxShadow: signupLoading ? 'none' : '0 4px 16px rgba(16,185,129,0.35)',
                   }}

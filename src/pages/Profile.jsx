@@ -17,7 +17,10 @@ import {
 
 const blankBorrower = {
   firstname: '',
+  middle_name: '',
   lastname: '',
+  gender: 'Male',
+  college: 'CTECH',
   mobile_phone: '',
   phone: '',
   email: '',
@@ -54,7 +57,10 @@ export default function Profile() {
         const borrowed = res.data.borrower || {};
         setBorrower({
           firstname: borrowed.firstname || res.data.username?.split(' ')?.[0] || '',
+          middle_name: borrowed.middle_name || '',
           lastname: borrowed.lastname || res.data.username?.split(' ')?.slice(1).join(' ') || '',
+          gender: borrowed.gender || 'Male',
+          college: borrowed.college || 'CTECH',
           mobile_phone: borrowed.mobile_phone || '',
           phone: borrowed.phone || '',
           email: borrowed.email || '',
@@ -108,21 +114,22 @@ export default function Profile() {
         payload.password = password;
       }
 
-      if (isBorrower) {
-        const firstname = borrower.firstname.trim();
-        const lastname = borrower.lastname.trim();
-        payload.username = `${firstname} ${lastname}`.trim();
-        payload.borrower = {
-          firstname,
-          lastname,
-          mobile_phone: borrower.mobile_phone.trim(),
-          phone: borrower.phone.trim(),
-          email: borrower.email.trim(),
-          address: borrower.address.trim(),
-          notes: borrower.notes.trim(),
-          type: borrower.type,
-        };
-      }
+      const firstname = borrower.firstname.trim();
+      const lastname = borrower.lastname.trim();
+      payload.username = `${firstname} ${lastname}`.trim();
+      payload.borrower = {
+        firstname,
+        middle_name: borrower.middle_name.trim(),
+        lastname,
+        gender: borrower.gender,
+        college: borrower.college,
+        mobile_phone: borrower.mobile_phone.trim(),
+        phone: borrower.phone.trim(),
+        email: borrower.email.trim(),
+        address: borrower.address.trim(),
+        notes: borrower.notes.trim(),
+        type: borrower.type,
+      };
 
       const res = await api.patch('/auth/me', payload);
       toast.success('Profile updated successfully');
@@ -133,7 +140,10 @@ export default function Profile() {
       if (res.data.borrower) {
         setBorrower({
           firstname: res.data.borrower.firstname || '',
+          middle_name: res.data.borrower.middle_name || '',
           lastname: res.data.borrower.lastname || '',
+          gender: res.data.borrower.gender || 'Male',
+          college: res.data.borrower.college || 'CTECH',
           mobile_phone: res.data.borrower.mobile_phone || '',
           phone: res.data.borrower.phone || '',
           email: res.data.borrower.email || '',
@@ -265,25 +275,32 @@ export default function Profile() {
                 </div>
               </section>
 
-              {isBorrower && (
-                <section>
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center border border-white/70 shadow-sm">
-                      <FiProfile size={18} />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-black text-slate-800 tracking-tight">Borrower Profile</h2>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Editable borrower record</p>
-                    </div>
+              <section>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center border border-white/70 shadow-sm">
+                    <FiProfile size={18} />
                   </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-800 tracking-tight">{isBorrower ? 'Borrower Profile' : 'Personal Details'}</h2>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Editable personal record</p>
+                  </div>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">First Name</label>
                       <input
                         className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
                         value={borrower.firstname}
                         onChange={(e) => handleBorrowerChange('firstname', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Middle Name</label>
+                      <input
+                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
+                        value={borrower.middle_name}
+                        onChange={(e) => handleBorrowerChange('middle_name', e.target.value)}
                       />
                     </div>
                     <div>
@@ -294,6 +311,38 @@ export default function Profile() {
                         onChange={(e) => handleBorrowerChange('lastname', e.target.value)}
                       />
                     </div>
+                  </div>
+                  <div className={`grid grid-cols-1 ${isBorrower ? 'md:grid-cols-2' : ''} gap-4 mt-4`}>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Gender</label>
+                      <select
+                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
+                        value={borrower.gender}
+                        onChange={(e) => handleBorrowerChange('gender', e.target.value)}
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    {isBorrower && (
+                      <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">College</label>
+                        <select
+                          className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
+                          value={borrower.college}
+                          onChange={(e) => handleBorrowerChange('college', e.target.value)}
+                        >
+                          <option value="CTECH">CTECH</option>
+                          <option value="CFES">CFES</option>
+                          <option value="CBM">CBM</option>
+                          <option value="COAS">COAS</option>
+                          <option value="CTE">CTE</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1 flex items-center gap-1.5"><FiPhone size={12} /> Mobile Phone</label>
                       <input
@@ -354,7 +403,6 @@ export default function Profile() {
                     </div>
                   </div>
                 </section>
-              )}
 
               <div className="flex justify-end pt-2">
                 <button
