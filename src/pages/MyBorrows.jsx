@@ -19,19 +19,31 @@ import { useAuth } from '../context/AuthContext';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+// Parse a DATE string (YYYY-MM-DD or ISO) as LOCAL midnight to avoid UTC offset issues.
+// new Date("2026-08-16") is parsed as UTC midnight which in UTC+8 is Aug 15 4pm local.
+function parseDateLocal(value) {
+  if (!value) return null;
+  const s = String(value).split('T')[0]; // strip time part if present
+  const [y, m, d] = s.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d); // local midnight
+}
+
 function fmtDate(value) {
   if (!value) return '—';
-  const d = new Date(value);
-  return isNaN(d.getTime())
+  const d = parseDateLocal(value);
+  return !d || isNaN(d.getTime())
     ? '—'
     : d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function daysUntilDue(dueDateStr) {
-  if (!dueDateStr) return null;
-  const due = new Date(String(dueDateStr).split('T')[0]);
-  const today = new Date(new Date().toISOString().split('T')[0]);
-  return Math.floor((due - today) / 86_400_000);
+  const due = parseDateLocal(dueDateStr);
+  if (!due) return null;
+  // today at local midnight
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((due - today) / 86_400_000);
 }
 
 function StatusBadge({ status, daysOverdue }) {

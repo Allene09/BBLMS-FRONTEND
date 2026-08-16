@@ -17,6 +17,7 @@ import Reservations from './pages/Reservations';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
 import MyBorrows from './pages/MyBorrows';
+import FinePayment from './pages/FinePayment';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="checkin" element={<RoleRoute roles={circulationRoles}><Checkin /></RoleRoute>} />
         <Route path="overdue" element={<RoleRoute roles={circulationRoles}><OverdueMonitoring /></RoleRoute>} />
         <Route path="records" element={<RoleRoute roles={circulationRoles}><BorrowRecords /></RoleRoute>} />
+        <Route path="fine-payments" element={<RoleRoute roles={circulationRoles}><FinePayment /></RoleRoute>} />
         <Route path="reports" element={<RoleRoute roles={adminLibrarianRoles}><Reports /></RoleRoute>} />
         <Route path="reservations" element={<RoleRoute roles={librarianOnlyRoles}><Reservations /></RoleRoute>} />
         <Route path="profile" element={<Profile />} />

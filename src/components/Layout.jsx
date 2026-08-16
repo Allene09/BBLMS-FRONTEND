@@ -5,6 +5,7 @@ import {
   PiArrowCircleRight as FiArrowRightCircle, PiArrowCircleLeft as FiArrowLeftCircle, PiCalendarCheck as FiCalendar,
   PiGear as FiSettings, PiList as FiMenu, PiX as FiX, PiCaretRight as FiChevronRight, PiWarning as FiWarning,
   PiReceipt as FiReceipt, PiChartBar as FiChartBar, PiUserCircle as FiProfile, PiBookOpenText as FiMyBorrows,
+  PiCashRegister as FiCashRegister,
 } from 'react-icons/pi';
 import { useState } from 'react';
 
@@ -16,7 +17,8 @@ const navItems = [
   { path: '/app/checkout',  icon: FiArrowRightCircle, label: 'Borrow Book',          roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
   { path: '/app/checkin',   icon: FiArrowLeftCircle,  label: 'Return Book',          roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
   { path: '/app/overdue',   icon: FiWarning,          label: 'Overdue Monitoring',   roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
-  { path: '/app/records',   icon: FiReceipt,          label: 'Borrow Records',       roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/records',       icon: FiReceipt,       label: 'Borrow Records',     roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
+  { path: '/app/fine-payments', icon: FiCashRegister,  label: 'Fine Payments',      roles: ['LIBRARIAN', 'CIRCULATION_IN_CHARGE'] },
   { path: '/app/reports',   icon: FiChartBar,         label: 'Reports',              roles: ['ADMIN', 'ADMINISTRATOR', 'LIBRARIAN'] },
   { path: '/app/reservations', icon: FiCalendar,  label: 'Reservations',            roles: ['LIBRARIAN'] },
   { path: '/app/profile',   icon: FiProfile,        label: 'Profile',                roles: [] },
