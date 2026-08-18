@@ -13,7 +13,7 @@ const highlights = [
 ];
 
 const emptySignup = {
-  id_no: '', firstname: '', middle_name: '', lastname: '', gender: 'Male', college: 'CTECH', password: '', confirm_password: '',
+  id_no: '', firstname: '', middle_name: '', lastname: '', gender: 'Male', college: 'CTECH',
   mobile_phone: '', phone: '', email: '', address: '', notes: '', type: 'STUDENT'
 };
 
@@ -56,7 +56,6 @@ export default function Login() {
   const [showSignup, setShowSignup] = useState(selfSignupEnabled ? (location.state?.showSignup || false) : false);
   const [signupForm, setSignupForm] = useState({ ...emptySignup });
   const [signupLoading, setSignupLoading] = useState(false);
-  const [showSignupPw, setShowSignupPw] = useState(false);
 
   const stats = [
     { icon: FiBook, key: 'totalBooks', label: 'Books' },
@@ -118,14 +117,8 @@ export default function Login() {
     e.preventDefault();
 
     // Validation
-    if (!signupForm.id_no || !signupForm.firstname || !signupForm.lastname || !signupForm.password) {
+    if (!signupForm.id_no || !signupForm.firstname || !signupForm.lastname) {
       return toast.error('Please fill in all required fields');
-    }
-    if (signupForm.password.length < 6) {
-      return toast.error('Password must be at least 6 characters');
-    }
-    if (signupForm.password !== signupForm.confirm_password) {
-      return toast.error('Passwords do not match');
     }
 
     setSignupLoading(true);
@@ -387,7 +380,7 @@ export default function Login() {
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-5 flex items-center justify-between rounded-t-xl">
               <div className="border-l-4 border-blue-500 pl-4">
-                <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
+                <h2 className="text-xl font-bold text-gray-900">Submit Registration</h2>
                 <p className="text-sm text-gray-500 mt-0.5">Fill in your information to register</p>
               </div>
               <button
@@ -419,39 +412,6 @@ export default function Login() {
                       onChange={(e) => handleSignupChange('id_no', e.target.value)}
                       required
                     />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Password <span className="text-red-400">*</span></label>
-                      <div className="relative">
-                        <input
-                          type={showSignupPw ? 'text' : 'password'}
-                          className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
-                          placeholder="Min 6 characters"
-                          value={signupForm.password}
-                          onChange={(e) => handleSignupChange('password', e.target.value)}
-                          required
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                          onClick={() => setShowSignupPw(!showSignupPw)}
-                        >
-                          {showSignupPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Confirm Password <span className="text-red-400">*</span></label>
-                      <input
-                        type={showSignupPw ? 'text' : 'password'}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
-                        placeholder="Repeat password"
-                        value={signupForm.confirm_password}
-                        onChange={(e) => handleSignupChange('confirm_password', e.target.value)}
-                        required
-                      />
-                    </div>
                   </div>
                 </div>
               </div>
@@ -622,12 +582,12 @@ export default function Login() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Creating Account...
+                      Submitting Registration...
                     </>
                   ) : (
                     <>
                       <FiCheck size={18} />
-                      Create Account
+                      Submit Registration
                     </>
                   )}
                 </button>

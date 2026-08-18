@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft } from 'react-icons/pi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft, PiEye as FiEye } from 'react-icons/pi';
 
 const emptyUser = {
   user_id: '', username: '', password: '', designation: '',
@@ -16,6 +16,12 @@ export default function Users() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reviewingId, setReviewingId] = useState(null);
+
+  const [showViewSignupModal, setShowViewSignupModal] = useState(false);
+  const [viewingSignup, setViewingSignup] = useState(null);
+
+  const [showViewUserModal, setShowViewUserModal] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
 
   // Borrow book states
   const [showBorrowModal, setShowBorrowModal] = useState(false);
@@ -278,6 +284,13 @@ export default function Users() {
                   <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
                     <button
                       type="button"
+                      onClick={() => { setViewingSignup(signup); setShowViewSignupModal(true); }}
+                      className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-[11px] uppercase tracking-wider transition-all border border-blue-200/70"
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleReviewSignup(signup, 'deny')}
                       disabled={reviewingId === signup.id}
                       className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-[11px] uppercase tracking-wider transition-all border border-rose-200/70 disabled:opacity-50"
@@ -349,7 +362,13 @@ export default function Users() {
                       <span className="text-slate-300 font-bold">—</span>
                     )}
                   </td>
-                  <td className="p-4 pr-8 text-right">
+                  <td className="p-4 pr-8 text-right flex justify-end gap-2">
+                    <button 
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-blue-50 hover:border-blue-200/60 text-blue-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md" 
+                      onClick={() => { setViewingUser(u); setShowViewUserModal(true); }}
+                    >
+                      <FiEye size={14} /> View
+                    </button>
                     <button 
                       className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-indigo-50 hover:border-indigo-200/60 text-indigo-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md" 
                       onClick={() => handleEdit(u)}
@@ -363,6 +382,170 @@ export default function Users() {
           </table>
         </div>
       </div>
+
+      {/* View Signup Modal */}
+      {showViewSignupModal && viewingSignup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewSignupModal(false)} />
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
+            <div className="p-6 lg:p-8 relative z-10">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">Review Profile</h2>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Pending Registration Details</p>
+                </div>
+                <button onClick={() => setShowViewSignupModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                  <FiX size={20} />
+                </button>
+              </div>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.user_id}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Full Name</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingSignup.firstname, viewingSignup.lastname].filter(Boolean).join(' ') || viewingSignup.username}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Borrower Type</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.borrower_type || 'Student'}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">College</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.college || '—'}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Email</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.email || '—'}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Mobile Phone</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.mobile_phone || viewingSignup.phone || '—'}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Address</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.address || '—'}</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Notes</label>
+                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.notes || '—'}</div>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 pt-6 mt-2">
+                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewSignupModal(false)}>Close</button>
+                  <button type="button" onClick={() => { setShowViewSignupModal(false); handleReviewSignup(viewingSignup, 'approve'); }} className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.3)]">
+                    Approve
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View System User Modal */}
+      {showViewUserModal && viewingUser && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewUserModal(false)} />
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
+            <div className="p-6 lg:p-8 relative z-10">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">System User Profile</h2>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Account Information</p>
+                </div>
+                <button onClick={() => setShowViewUserModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                  <FiX size={20} />
+                </button>
+              </div>
+              <div className="space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                <div className="flex justify-center pb-2">
+                  <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl font-black text-white shadow-lg border-4 border-white/60"
+                    style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+                    {viewingUser?.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-indigo-500">System Account</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID (Username)</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.user_id}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Display Name</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.username}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Password</label>
+                      <div className="w-full bg-white/40 text-slate-500 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner italic">
+                        {viewingUser.access_right === 'BORROWER' ? 'bisu123 (Temporary)' : '•••••••• (Encrypted)'}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.access_right}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.designation || 'General Staff'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Status</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.status || 'APPROVED'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {viewingUser.firstname && (
+                  <div>
+                    <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-emerald-500">User Profiling</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Full Name</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingUser.firstname, viewingUser.lastname].filter(Boolean).join(' ')}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Borrower Type</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.borrower_type || '—'}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">College</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.college || '—'}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Email</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.email || '—'}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Mobile Phone</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.mobile_phone || viewingUser.phone || '—'}</div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Address</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.address || '—'}</div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Notes</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.notes || '—'}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex justify-end gap-3 pt-6 mt-2">
+                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewUserModal(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit/Add User Modal */}
       {showModal && (

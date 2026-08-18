@@ -501,23 +501,38 @@ export default function FinePayment() {
 
                           {/* Fine amount */}
                           <td className="p-4">
-                            <div className="inline-flex items-end gap-1 px-3 py-1.5 rounded-xl"
-                              style={{ background: 'rgba(254,226,226,0.6)', border: '1px solid rgba(252,165,165,0.3)' }}>
-                              <span className="text-[9px] font-black uppercase text-red-400 mb-0.5">PHP</span>
-                              <span className="font-black text-red-600 text-lg leading-none">{fmt(fine.total_fine)}</span>
+                            <div className="inline-flex flex-col gap-1">
+                              <div className="inline-flex items-end gap-1 px-3 py-1.5 rounded-xl"
+                                style={{ background: 'rgba(254,226,226,0.6)', border: '1px solid rgba(252,165,165,0.3)' }}>
+                                <span className="text-[9px] font-black uppercase text-red-400 mb-0.5">PHP</span>
+                                <span className="font-black text-red-600 text-lg leading-none">{fmt(fine.total_fine)}</span>
+                              </div>
+                              {fine.loan_status === 'Overdue' && (
+                                <span className="text-[9px] font-black uppercase text-red-400 ml-1 tracking-widest">Accruing</span>
+                              )}
                             </div>
                           </td>
 
                           {/* Action */}
                           <td className="p-4">
-                            <button
-                              onClick={() => setSelectedFine(fine)}
-                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-black text-white rounded-xl shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border border-emerald-400 active:translate-y-0"
-                              style={{ background: 'linear-gradient(135deg, #059669, #0d9488)', boxShadow: '0 4px 16px rgba(5,150,105,0.3)' }}
-                            >
-                              <FiCashRegister size={15} />
-                              Pay Fine
-                            </button>
+                            {fine.loan_status === 'Overdue' ? (
+                              <button
+                                onClick={() => toast.error('Return the book in the Check-in tab first to finalize the fine.')}
+                                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-[10px] font-black text-amber-700 bg-amber-50 rounded-xl shadow-sm transition-all duration-200 hover:bg-amber-100 border border-amber-200 uppercase tracking-widest"
+                              >
+                                <FiBook size={15} />
+                                Return First
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setSelectedFine(fine)}
+                                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-black text-white rounded-xl shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border border-emerald-400 active:translate-y-0 uppercase tracking-wider"
+                                style={{ background: 'linear-gradient(135deg, #059669, #0d9488)', boxShadow: '0 4px 16px rgba(5,150,105,0.3)' }}
+                              >
+                                <FiCashRegister size={15} />
+                                Pay Fine
+                              </button>
+                            )}
                           </td>
                         </tr>
                       );
