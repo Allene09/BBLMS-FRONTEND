@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft, PiEye as FiEye, PiEyeSlash as FiEyeOff } from 'react-icons/pi';
 
 const emptyUser = {
-  user_id: '', username: '', password: '', designation: '',
+  user_id: '', username: '', password: 'bisu123', email: '', designation: '',
   access_right: 'STAFF', is_admin: false,
 };
 
@@ -17,6 +17,7 @@ export default function Users() {
   const [loading, setLoading] = useState(false);
   const [reviewingId, setReviewingId] = useState(null);
   const [showPw, setShowPw] = useState(false);
+  const [showViewPw, setShowViewPw] = useState(false);
 
   const [showViewSignupModal, setShowViewSignupModal] = useState(false);
   const [viewingSignup, setViewingSignup] = useState(null);
@@ -221,287 +222,296 @@ export default function Users() {
     <div className="min-h-[calc(100vh-80px)] -m-6 p-6 lg:p-10 relative overflow-hidden flex flex-col font-sans">
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#f8fafc] via-[#eff6ff] to-[#f5f3ff] z-0" />
-      
+
       {/* Soft floating gradient orbs */}
       <div className="absolute top-[-10%] left-[-5%] w-[40rem] h-[40rem] bg-blue-300/50 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
       <div className="absolute top-[20%] right-[-10%] w-[35rem] h-[35rem] bg-purple-300/40 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
       <div className="absolute bottom-[-20%] left-[20%] w-[45rem] h-[45rem] bg-indigo-300/40 rounded-full mix-blend-multiply filter blur-[100px] z-0" />
 
       <div className="relative z-10 max-w-[1600px] w-full mx-auto flex-1 flex flex-col">
-      {/* Header */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight drop-shadow-sm mb-2">System Users</h1>
-          <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">Manage Accounts & Access Rights</p>
+        {/* Header */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight drop-shadow-sm mb-2">System Users</h1>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em]">Manage Accounts & Access Rights</p>
+          </div>
+          <button
+            onClick={handleNew}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_10px_25px_rgba(79,70,229,0.4)] hover:-translate-y-0.5"
+          >
+            <FiPlus size={16} className="text-indigo-200" /> Appoint User
+          </button>
         </div>
-        <button 
-          onClick={handleNew}
-          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)] hover:shadow-[0_10px_25px_rgba(79,70,229,0.4)] hover:-translate-y-0.5"
-        >
-          <FiPlus size={16} className="text-indigo-200" /> Appoint User
-        </button>
-      </div>
 
-      {pendingSignups.length > 0 && (
-        <div className="mb-8 bg-white/50 backdrop-blur-2xl rounded-[2rem] border border-amber-200/60 shadow-[0_8px_40px_rgb(0,0,0,0.05)] overflow-hidden relative z-10">
-          <div className="p-6 lg:p-7 border-b border-amber-100/70 bg-gradient-to-r from-amber-50/80 to-white/60">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div>
-                <h2 className="text-2xl font-black text-amber-950 tracking-tight">Pending Borrower Signups</h2>
-                <p className="text-sm font-semibold text-amber-800/70 mt-1">Review new borrower accounts before they can sign in.</p>
+        {pendingSignups.length > 0 && (
+          <div className="mb-8 bg-white/50 backdrop-blur-2xl rounded-[2rem] border border-amber-200/60 shadow-[0_8px_40px_rgb(0,0,0,0.05)] overflow-hidden relative z-10">
+            <div className="p-6 lg:p-7 border-b border-amber-100/70 bg-gradient-to-r from-amber-50/80 to-white/60">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-black text-amber-950 tracking-tight">Pending Borrower Signups</h2>
+                  <p className="text-sm font-semibold text-amber-800/70 mt-1">Review new borrower accounts before they can sign in.</p>
+                </div>
+                <span className="inline-flex items-center justify-center px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.16em] bg-amber-100/80 text-amber-700 border border-amber-200/80">
+                  {pendingSignups.length} awaiting review
+                </span>
               </div>
-              <span className="inline-flex items-center justify-center px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.16em] bg-amber-100/80 text-amber-700 border border-amber-200/80">
-                {pendingSignups.length} awaiting review
-              </span>
+            </div>
+            <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
+              {pendingSignups.map((signup) => {
+                const fullName = [signup.firstname, signup.lastname].filter(Boolean).join(' ') || signup.username || 'Unnamed Borrower';
+                return (
+                  <div key={signup.id} className="rounded-[1.5rem] border border-white/80 bg-white/80 shadow-sm p-5 flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-1">Borrower Account</p>
+                        <h3 className="text-lg font-black text-slate-800 tracking-tight">{fullName}</h3>
+                        <p className="text-xs font-bold text-slate-500 mt-1">ID No: {signup.user_id}</p>
+                      </div>
+                      {renderStatusBadge(signup.status)}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Contact</p>
+                        <p className="font-bold text-slate-700 mt-1">{signup.mobile_phone || signup.phone || '—'}</p>
+                        <p className="text-xs text-slate-500">{signup.email || 'No email provided'}</p>
+                      </div>
+                      <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Borrower Type</p>
+                        <p className="font-bold text-slate-700 mt-1">{signup.borrower_type || 'Student'}</p>
+                        <p className="text-xs text-slate-500">{signup.address || 'No address provided'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => { setViewingSignup(signup); setShowViewSignupModal(true); }}
+                        className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-[11px] uppercase tracking-wider transition-all border border-blue-200/70"
+                      >
+                        View
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleReviewSignup(signup, 'deny')}
+                        disabled={reviewingId === signup.id}
+                        className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-[11px] uppercase tracking-wider transition-all border border-rose-200/70 disabled:opacity-50"
+                      >
+                        Deny
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleReviewSignup(signup, 'approve')}
+                        disabled={reviewingId === signup.id}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.25)] disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {pendingSignups.map((signup) => {
-              const fullName = [signup.firstname, signup.lastname].filter(Boolean).join(' ') || signup.username || 'Unnamed Borrower';
-              return (
-                <div key={signup.id} className="rounded-[1.5rem] border border-white/80 bg-white/80 shadow-sm p-5 flex flex-col gap-4">
-                  <div className="flex items-start justify-between gap-4">
+        )}
+
+        {/* Main Table */}
+        <div className="bg-white/30 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+          <div className="overflow-x-auto relative z-10 custom-scrollbar max-h-[calc(100vh-200px)] min-h-[500px]">
+            <table className="w-full text-left border-collapse min-w-[900px]">
+              <thead className="bg-white/20 backdrop-blur-md sticky top-0 z-20">
+                <tr className="border-b border-white/40">
+                  <th className="p-5 pl-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Identity</th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Role / Designation</th>
+                  <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Access Right</th>
+                  <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Account Status</th>
+                  <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">System Admin</th>
+                  <th className="p-5 pr-8 text-right text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/30">
+                {users.length === 0 ? (
+                  <tr><td colSpan={6} className="text-center py-16">
+                    <div className="flex flex-col items-center justify-center text-slate-400">
+                      <FiSearch size={32} className="mb-4 opacity-50 block mx-auto" />
+                      <p className="font-black text-sm">No system users assigned.</p>
+                    </div>
+                  </td></tr>
+                ) : users.map((u) => (
+                  <tr key={u.id} className={`hover:bg-white/40 transition-colors group cursor-default ${String(u.status || '').toUpperCase() === 'PENDING' ? 'bg-amber-50/40' : ''}`}>
+                    <td className="p-4 pl-8">
+                      <p className="font-bold text-sm text-slate-800">{u.username}</p>
+                      <p className="text-[10px] text-indigo-500 font-black">ID: {u.user_id}</p>
+                    </td>
+                    <td className="p-4">
+                      <p className="font-bold text-sm text-slate-700">{u.designation || 'General Staff'}</p>
+                    </td>
+                    <td className="p-4 text-center">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur-sm border bg-emerald-100/60 text-emerald-700 border-emerald-200/50">
+                        {u.access_right}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center">
+                      {renderStatusBadge(u.status)}
+                    </td>
+                    <td className="p-4 text-center">
+                      {u.is_admin ? (
+                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100/60 border border-amber-200/60 shadow-sm">
+                          <FiShield className="text-amber-600" size={16} />
+                        </div>
+                      ) : (
+                        <span className="text-slate-300 font-bold">—</span>
+                      )}
+                    </td>
+                    <td className="p-4 pr-8 text-right flex justify-end gap-2">
+                      <button
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-blue-50 hover:border-blue-200/60 text-blue-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md"
+                        onClick={() => { setViewingUser(u); setShowViewUserModal(true); }}
+                      >
+                        <FiEye size={14} /> View
+                      </button>
+                      <button
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-indigo-50 hover:border-indigo-200/60 text-indigo-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md"
+                        onClick={() => handleEdit(u)}
+                      >
+                        <FiEdit2 size={14} /> Configure
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* View Signup Modal */}
+        {showViewSignupModal && viewingSignup && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewSignupModal(false)} />
+            <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
+              <div className="p-6 lg:p-8 relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Review Profile</h2>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Pending Registration Details</p>
+                  </div>
+                  <button onClick={() => setShowViewSignupModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                    <FiX size={20} />
+                  </button>
+                </div>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-1">Borrower Account</p>
-                      <h3 className="text-lg font-black text-slate-800 tracking-tight">{fullName}</h3>
-                      <p className="text-xs font-bold text-slate-500 mt-1">ID No: {signup.user_id}</p>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.user_id}</div>
                     </div>
-                    {renderStatusBadge(signup.status)}
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Full Name</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingSignup.firstname, viewingSignup.lastname].filter(Boolean).join(' ') || viewingSignup.username}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Borrower Type</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.borrower_type || 'Student'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">College</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.college || '—'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Email</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.email || '—'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Mobile Phone</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.mobile_phone || viewingSignup.phone || '—'}</div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Address</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.address || '—'}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Notes</label>
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.notes || '—'}</div>
+                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
-                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Contact</p>
-                      <p className="font-bold text-slate-700 mt-1">{signup.mobile_phone || signup.phone || '—'}</p>
-                      <p className="text-xs text-slate-500">{signup.email || 'No email provided'}</p>
-                    </div>
-                    <div className="rounded-xl bg-slate-50/80 p-3 border border-slate-100">
-                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Borrower Type</p>
-                      <p className="font-bold text-slate-700 mt-1">{signup.borrower_type || 'Student'}</p>
-                      <p className="text-xs text-slate-500">{signup.address || 'No address provided'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => { setViewingSignup(signup); setShowViewSignupModal(true); }}
-                      className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-black text-[11px] uppercase tracking-wider transition-all border border-blue-200/70"
-                    >
-                      View
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReviewSignup(signup, 'deny')}
-                      disabled={reviewingId === signup.id}
-                      className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-[11px] uppercase tracking-wider transition-all border border-rose-200/70 disabled:opacity-50"
-                    >
-                      Deny
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReviewSignup(signup, 'approve')}
-                      disabled={reviewingId === signup.id}
-                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.25)] disabled:opacity-50"
-                    >
+                  <div className="flex justify-end gap-3 pt-6 mt-2">
+                    <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewSignupModal(false)}>Close</button>
+                    <button type="button" onClick={() => { setShowViewSignupModal(false); handleReviewSignup(viewingSignup, 'approve'); }} className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.3)]">
                       Approve
                     </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Main Table */}
-      <div className="bg-white/30 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
-        <div className="overflow-x-auto relative z-10 custom-scrollbar max-h-[calc(100vh-200px)] min-h-[500px]">
-          <table className="w-full text-left border-collapse min-w-[900px]">
-            <thead className="bg-white/20 backdrop-blur-md sticky top-0 z-20">
-              <tr className="border-b border-white/40">
-                <th className="p-5 pl-8 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Identity</th>
-                <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Role / Designation</th>
-                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Access Right</th>
-                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Account Status</th>
-                <th className="p-5 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">System Admin</th>
-                <th className="p-5 pr-8 text-right text-[11px] font-black uppercase tracking-[0.2em] text-slate-500/80">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/30">
-              {users.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-16">
-                   <div className="flex flex-col items-center justify-center text-slate-400">
-                    <FiSearch size={32} className="mb-4 opacity-50 block mx-auto" />
-                    <p className="font-black text-sm">No system users assigned.</p>
-                  </div>
-                </td></tr>
-              ) : users.map((u) => (
-                <tr key={u.id} className={`hover:bg-white/40 transition-colors group cursor-default ${String(u.status || '').toUpperCase() === 'PENDING' ? 'bg-amber-50/40' : ''}`}>
-                  <td className="p-4 pl-8">
-                    <p className="font-bold text-sm text-slate-800">{u.username}</p>
-                    <p className="text-[10px] text-indigo-500 font-black">ID: {u.user_id}</p>
-                  </td>
-                  <td className="p-4">
-                    <p className="font-bold text-sm text-slate-700">{u.designation || 'General Staff'}</p>
-                  </td>
-                  <td className="p-4 text-center">
-                    <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm backdrop-blur-sm border bg-emerald-100/60 text-emerald-700 border-emerald-200/50">
-                      {u.access_right}
-                    </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    {renderStatusBadge(u.status)}
-                  </td>
-                  <td className="p-4 text-center">
-                    {u.is_admin ? (
-                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100/60 border border-amber-200/60 shadow-sm">
-                        <FiShield className="text-amber-600" size={16} />
-                      </div>
-                    ) : (
-                      <span className="text-slate-300 font-bold">—</span>
-                    )}
-                  </td>
-                  <td className="p-4 pr-8 text-right flex justify-end gap-2">
-                    <button 
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-blue-50 hover:border-blue-200/60 text-blue-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md" 
-                      onClick={() => { setViewingUser(u); setShowViewUserModal(true); }}
-                    >
-                      <FiEye size={14} /> View
-                    </button>
-                    <button 
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/50 border border-white/60 hover:bg-indigo-50 hover:border-indigo-200/60 text-indigo-600 font-bold text-xs transition-all shadow-sm group-hover:shadow-md" 
-                      onClick={() => handleEdit(u)}
-                    >
-                      <FiEdit2 size={14} /> Configure
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* View Signup Modal */}
-      {showViewSignupModal && viewingSignup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewSignupModal(false)} />
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
-            <div className="p-6 lg:p-8 relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">Review Profile</h2>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Pending Registration Details</p>
-                </div>
-                <button onClick={() => setShowViewSignupModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
-                  <FiX size={20} />
-                </button>
-              </div>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.user_id}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Full Name</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingSignup.firstname, viewingSignup.lastname].filter(Boolean).join(' ') || viewingSignup.username}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Borrower Type</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.borrower_type || 'Student'}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">College</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.college || '—'}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Email</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.email || '—'}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Mobile Phone</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.mobile_phone || viewingSignup.phone || '—'}</div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Address</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.address || '—'}</div>
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Notes</label>
-                    <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingSignup.notes || '—'}</div>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3 pt-6 mt-2">
-                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewSignupModal(false)}>Close</button>
-                  <button type="button" onClick={() => { setShowViewSignupModal(false); handleReviewSignup(viewingSignup, 'approve'); }} className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(16,185,129,0.3)]">
-                    Approve
-                  </button>
-                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* View System User Modal */}
-      {showViewUserModal && viewingUser && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewUserModal(false)} />
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
-            <div className="p-6 lg:p-8 relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">System User Profile</h2>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Account Information</p>
-                </div>
-                <button onClick={() => setShowViewUserModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
-                  <FiX size={20} />
-                </button>
-              </div>
-              <div className="space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
-                <div className="flex justify-center pb-2">
-                  <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl font-black text-white shadow-lg border-4 border-white/60"
-                    style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
-                    {viewingUser?.username?.[0]?.toUpperCase() || 'U'}
+        {/* View System User Modal */}
+        {showViewUserModal && viewingUser && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowViewUserModal(false)} />
+            <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
+              <div className="p-6 lg:p-8 relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">System User Profile</h2>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Account Information</p>
                   </div>
+                  <button onClick={() => setShowViewUserModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                    <FiX size={20} />
+                  </button>
                 </div>
-                
-                <div>
-                  <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-indigo-500">System Account</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID (Username)</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.user_id}</div>
+                <div className="space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                  <div className="flex justify-center pb-2">
+                    <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl font-black text-white shadow-lg border-4 border-white/60"
+                      style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+                      {viewingUser?.username?.[0]?.toUpperCase() || 'U'}
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Display Name</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.username}</div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Password</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">
-                        bisu123
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-indigo-500">System Account</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">User ID</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.user_id}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Display Name</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.username}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Password</label>
+                        <div className="relative">
+                          <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 pr-12 shadow-inner">
+                            {showViewPw ? 'bisu123' : '••••••••'}
+                          </div>
+                          <button
+                            type="button"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1"
+                            onClick={() => setShowViewPw(!showViewPw)}
+                          >
+                            {showViewPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.access_right}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.designation || 'General Staff'}</div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Status</label>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.status || 'APPROVED'}</div>
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.access_right}</div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.designation || 'General Staff'}</div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Status</label>
-                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{viewingUser.status || 'APPROVED'}</div>
-                    </div>
                   </div>
-                </div>
 
                   <div>
                     <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-emerald-500">User Profiling</h3>
@@ -536,118 +546,127 @@ export default function Users() {
                       </div>
                     </div>
                   </div>
-                
-                <div className="flex justify-end gap-3 pt-6 mt-2">
-                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewUserModal(false)}>Close</button>
+
+                  <div className="flex justify-end gap-3 pt-6 mt-2">
+                    <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewUserModal(false)}>Close</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Edit/Add User Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
-            
-            <div className="p-6 lg:p-8 relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">{editing ? 'Configure Profile' : 'Appoint User'}</h2>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Access Management Matrix</p>
-                </div>
-                <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
-                  <FiX size={20} />
-                </button>
-              </div>
+        {/* Edit/Add User Modal */}
+        {showModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+            <div className="bg-white/60 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_rgb(0,0,0,0.15)] rounded-[2.5rem] w-full max-w-2xl relative z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/10 pointer-events-none" />
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="md:col-span-1">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID *</label>
-                    <input 
-                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner disabled:opacity-50" 
-                      value={form.user_id} onChange={(e) => handleChange('user_id', e.target.value)} required disabled={editing} 
-                      placeholder="e.g. EMP-001"
-                    />
+              <div className="p-6 lg:p-8 relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">{editing ? 'Configure Profile' : 'Appoint User'}</h2>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Access Management Matrix</p>
                   </div>
-                  <div className="md:col-span-1">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Username *</label>
-                    <input 
-                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
-                      value={form.username} onChange={(e) => handleChange('username', e.target.value)} required 
-                      placeholder="Display Name"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">{editing ? 'Regenerate Password (Optional)' : 'Secret Password *'}</label>
-                    <div className="relative">
-                      <input 
-                        type={showPw ? 'text' : 'password'}
-                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 pr-12 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
-                        value={form.password} onChange={(e) => handleChange('password', e.target.value)} required={!editing} 
-                        placeholder={editing ? "Leave blank to keep existing password" : "Enter a secure password"}
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1"
-                        onClick={() => setShowPw(!showPw)}
-                      >
-                        {showPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
-                    <input 
-                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
-                      value={form.designation} onChange={(e) => handleChange('designation', e.target.value)} 
-                      placeholder="e.g. Head Librarian"
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
-                    <select 
-                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner appearance-none custom-select cursor-pointer" 
-                      value={form.access_right} onChange={(e) => handleChange('access_right', e.target.value)}
-                    >
-                      <option value="STAFF">Staff Level</option>
-                      <option value="LIBRARIAN">Librarian Level</option>
-                      <option value="CIRCULATION_IN_CHARGE">Circulation Dept</option>
-                      <option value="ADMIN">Administrator Level</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="mt-4 p-4 bg-amber-50/50 border border-amber-200/50 rounded-2xl backdrop-blur-sm">
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <div>
-                      <span className="text-sm font-black text-amber-900 drop-shadow-sm flex items-center gap-2">
-                        <FiShield className="text-amber-600" /> Grant Root Privileges
-                      </span>
-                      <p className="text-[10px] font-bold text-amber-700/70 mt-1">This permits overriding system configs and editing other users.</p>
-                    </div>
-                    <div className="relative">
-                      <input type="checkbox" checked={form.is_admin} onChange={(e) => handleChange('is_admin', e.target.checked)} className="peer sr-only" />
-                      <div className="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
-                    </div>
-                  </label>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-6 mt-2">
-                  <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowModal(false)}>Cancel</button>
-                  <button type="submit" className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)]" disabled={loading}>
-                    {loading ? 'Authenticating...' : (editing ? 'Update Profile' : 'Appoint Network User')}
+                  <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center text-slate-500 transition-colors shadow-sm border border-white/60">
+                    <FiX size={20} />
                   </button>
                 </div>
-              </form>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="md:col-span-1">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">System ID *</label>
+                      <input
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner disabled:opacity-50"
+                        value={form.user_id} onChange={(e) => handleChange('user_id', e.target.value)} required disabled={editing}
+                        placeholder="e.g. EMP-001"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Username *</label>
+                      <input
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner"
+                        value={form.username} onChange={(e) => handleChange('username', e.target.value)} required
+                        placeholder="Display Name"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Email Address</label>
+                      <input
+                        type="email"
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner disabled:opacity-50"
+                        value={form.email || ''} onChange={(e) => handleChange('email', e.target.value)} disabled={editing}
+                        placeholder="e.g. user@example.com"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">{editing ? 'Regenerate Password (Optional)' : 'Secret Password *'}</label>
+                      <div className="relative">
+                        <input
+                          type={showPw ? 'text' : 'password'}
+                          className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 pr-12 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner"
+                          value={form.password} onChange={(e) => handleChange('password', e.target.value)} required={!editing}
+                          placeholder={editing ? "Leave blank to keep existing password" : "Enter a secure password"}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1"
+                          onClick={() => setShowPw(!showPw)}
+                        >
+                          {showPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>
+                      <input
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner"
+                        value={form.designation} onChange={(e) => handleChange('designation', e.target.value)}
+                        placeholder="e.g. Head Librarian"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Role Clearance</label>
+                      <select
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner appearance-none custom-select cursor-pointer"
+                        value={form.access_right} onChange={(e) => handleChange('access_right', e.target.value)}
+                      >
+                        <option value="STAFF">Staff Level</option>
+                        <option value="LIBRARIAN">Librarian Level</option>
+                        <option value="CIRCULATION_IN_CHARGE">Circulation Dept</option>
+                        <option value="ADMIN">Administrator Level</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-4 bg-amber-50/50 border border-amber-200/50 rounded-2xl backdrop-blur-sm">
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <div>
+                        <span className="text-sm font-black text-amber-900 drop-shadow-sm flex items-center gap-2">
+                          <FiShield className="text-amber-600" /> Grant Root Privileges
+                        </span>
+                        <p className="text-[10px] font-bold text-amber-700/70 mt-1">This permits overriding system configs and editing other users.</p>
+                      </div>
+                      <div className="relative">
+                        <input type="checkbox" checked={form.is_admin} onChange={(e) => handleChange('is_admin', e.target.checked)} className="peer sr-only" />
+                        <div className="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 shadow-inner"></div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-6 mt-2">
+                    <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowModal(false)}>Cancel</button>
+                    <button type="submit" className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.3)]" disabled={loading}>
+                      {loading ? 'Authenticating...' : (editing ? 'Update Profile' : 'Appoint Network User')}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );

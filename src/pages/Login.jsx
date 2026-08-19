@@ -110,6 +110,16 @@ export default function Login() {
   };
 
   const handleSignupChange = (field, value) => {
+    if (field === 'id_no') {
+      const numbersOnly = value.replace(/\D/g, '').slice(0, 6);
+      setSignupForm(prev => ({ ...prev, [field]: numbersOnly }));
+      return;
+    }
+    if (field === 'mobile_phone') {
+      const numbersOnly = value.replace(/\D/g, '').slice(0, 11);
+      setSignupForm(prev => ({ ...prev, [field]: numbersOnly }));
+      return;
+    }
     setSignupForm(prev => ({ ...prev, [field]: value }));
   };
 
@@ -119,6 +129,15 @@ export default function Login() {
     // Validation
     if (!signupForm.id_no || !signupForm.firstname || !signupForm.lastname) {
       return toast.error('Please fill in all required fields');
+    }
+    if (signupForm.id_no.length !== 6) {
+      return toast.error('ID No / Student ID must be exactly 6 digits');
+    }
+    if (signupForm.mobile_phone && signupForm.mobile_phone.length !== 11) {
+      return toast.error('Mobile Phone must be exactly 11 digits');
+    }
+    if (signupForm.email && !/^[a-zA-Z0-9._%+-]+@(gmail\.com|bisu\.edu\.ph)$/i.test(signupForm.email)) {
+      return toast.error('Please enter a valid Gmail or BISU email address');
     }
 
     setSignupLoading(true);
@@ -404,14 +423,15 @@ export default function Login() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1.5">ID No / Student ID <span className="text-red-400">*</span></label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
-                      placeholder="e.g., 2024-0001"
-                      value={signupForm.id_no}
-                      onChange={(e) => handleSignupChange('id_no', e.target.value)}
-                      required
-                    />
+                      <input
+                        type="text"
+                        maxLength="6"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all bg-gray-50/50"
+                        placeholder="e.g., 123456"
+                        value={signupForm.id_no}
+                        onChange={(e) => handleSignupChange('id_no', e.target.value)}
+                        required
+                      />
                   </div>
                 </div>
               </div>
@@ -494,6 +514,7 @@ export default function Login() {
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Mobile Phone</label>
                       <input
                         type="tel"
+                        maxLength="11"
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
                         placeholder="e.g., 09123456789"
                         value={signupForm.mobile_phone}
