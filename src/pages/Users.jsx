@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft, PiEye as FiEye } from 'react-icons/pi';
+import { PiPlus as FiPlus, PiPencilSimple as FiEdit2, PiX as FiX, PiShieldCheck as FiShield, PiBooks as FiBook, PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiListBullets as FiList, PiArrowElbowDownLeft as FiCornerDownLeft, PiEye as FiEye, PiEyeSlash as FiEyeOff } from 'react-icons/pi';
 
 const emptyUser = {
   user_id: '', username: '', password: '', designation: '',
@@ -16,6 +16,7 @@ export default function Users() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reviewingId, setReviewingId] = useState(null);
+  const [showPw, setShowPw] = useState(false);
 
   const [showViewSignupModal, setShowViewSignupModal] = useState(false);
   const [viewingSignup, setViewingSignup] = useState(null);
@@ -483,8 +484,8 @@ export default function Users() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Password</label>
-                      <div className="w-full bg-white/40 text-slate-500 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner italic">
-                        {viewingUser.access_right === 'BORROWER' ? 'bisu123 (Temporary)' : '•••••••• (Encrypted)'}
+                      <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">
+                        bisu123
                       </div>
                     </div>
                     <div>
@@ -502,13 +503,12 @@ export default function Users() {
                   </div>
                 </div>
 
-                {viewingUser.firstname && (
                   <div>
                     <h3 className="text-sm font-black text-slate-700 tracking-wider uppercase mb-4 pl-2 border-l-4 border-emerald-500">User Profiling</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Full Name</label>
-                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingUser.firstname, viewingUser.lastname].filter(Boolean).join(' ')}</div>
+                        <div className="w-full bg-white/40 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 shadow-inner">{[viewingUser.firstname, viewingUser.lastname].filter(Boolean).join(' ') || '—'}</div>
                       </div>
                       <div>
                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Borrower Type</label>
@@ -536,7 +536,6 @@ export default function Users() {
                       </div>
                     </div>
                   </div>
-                )}
                 
                 <div className="flex justify-end gap-3 pt-6 mt-2">
                   <button type="button" className="px-6 py-3 rounded-xl bg-white/50 hover:bg-white/80 text-slate-600 font-black text-[11px] uppercase tracking-wider transition-colors shadow-sm border border-white/60" onClick={() => setShowViewUserModal(false)}>Close</button>
@@ -585,12 +584,21 @@ export default function Users() {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">{editing ? 'Regenerate Password (Optional)' : 'Secret Password *'}</label>
-                    <input 
-                      type="password" 
-                      className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
-                      value={form.password} onChange={(e) => handleChange('password', e.target.value)} required={!editing} 
-                      placeholder={editing ? "Leave blank to keep existing password" : "Enter a secure password"}
-                    />
+                    <div className="relative">
+                      <input 
+                        type={showPw ? 'text' : 'password'}
+                        className="w-full bg-white/40 focus:bg-white/60 text-slate-800 text-sm font-bold rounded-2xl border border-white/50 px-4 py-3 pr-12 outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 shadow-inner" 
+                        value={form.password} onChange={(e) => handleChange('password', e.target.value)} required={!editing} 
+                        placeholder={editing ? "Leave blank to keep existing password" : "Enter a secure password"}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1"
+                        onClick={() => setShowPw(!showPw)}
+                      >
+                        {showPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      </button>
+                    </div>
                   </div>
                   <div className="md:col-span-1">
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2 pl-2">Job Title / Designation</label>

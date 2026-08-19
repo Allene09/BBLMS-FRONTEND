@@ -13,6 +13,8 @@ import {
   PiMapPin as FiMapPin,
   PiUsersThree as FiUsers,
   PiUser as FiUser,
+  PiEye as FiEye,
+  PiEyeSlash as FiEyeOff,
 } from 'react-icons/pi';
 
 const blankBorrower = {
@@ -39,6 +41,8 @@ export default function Profile() {
   });
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [borrower, setBorrower] = useState({ ...blankBorrower });
 
   useEffect(() => {
@@ -254,23 +258,41 @@ export default function Profile() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">New Password</label>
-                    <input
-                      type="password"
-                      className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Leave blank to keep current password"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPw ? "text" : "password"}
+                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 pr-12 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Leave blank to keep current password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors p-1"
+                        onClick={() => setShowPw(!showPw)}
+                      >
+                        {showPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      </button>
+                    </div>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Confirm Password</label>
-                    <input
-                      type="password"
-                      className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat the new password"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPw ? "text" : "password"}
+                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 pr-12 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Repeat the new password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors p-1"
+                        onClick={() => setShowConfirmPw(!showConfirmPw)}
+                      >
+                        {showConfirmPw ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </section>

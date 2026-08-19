@@ -6,14 +6,12 @@ import { PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiPlus as FiPlus, Pi
 const emptyBorrowerForm = {
   id_no: '',
   firstname: '',
+  middle_name: '',
   lastname: '',
-  password: '',
-  confirm_password: '',
+  college: 'CTECH',
   mobile_phone: '',
-  phone: '',
   email: '',
   address: '',
-  notes: '',
   type: 'Student',
 };
 
@@ -120,14 +118,7 @@ export default function Checkout() {
     if (!borrowerForm.firstname.trim()) errors.firstname = 'First name is required';
     if (!borrowerForm.lastname.trim()) errors.lastname = 'Last name is required';
 
-    if (!borrowerForm.password) {
-      errors.password = 'Password is required';
-    } else if (borrowerForm.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-    if (borrowerForm.password !== borrowerForm.confirm_password) {
-      errors.confirm_password = 'Passwords do not match';
-    }
+
 
     const mobileDigits = borrowerForm.mobile_phone.replace(/\D/g, '');
     if (borrowerForm.mobile_phone && mobileDigits.length !== 11) {
@@ -146,13 +137,12 @@ export default function Checkout() {
       const payload = {
         id_no: borrowerForm.id_no.trim(),
         firstname: borrowerForm.firstname.trim(),
+        middle_name: borrowerForm.middle_name.trim(),
         lastname: borrowerForm.lastname.trim(),
-        password: borrowerForm.password,
+        college: borrowerForm.college,
         mobile_phone: borrowerForm.mobile_phone.replace(/\D/g, ''),
-        phone: borrowerForm.phone.trim(),
         email: borrowerForm.email.trim(),
         address: borrowerForm.address.trim(),
-        notes: borrowerForm.notes.trim() || null,
         type: borrowerForm.type,
       };
 
@@ -567,6 +557,14 @@ export default function Checkout() {
                   {registerErrors.firstname && <p className="text-xs text-red-500 mt-1">{registerErrors.firstname}</p>}
                 </div>
                 <div>
+                  <label className="form-label">Middle Name</label>
+                  <input
+                    className="form-input"
+                    value={borrowerForm.middle_name}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, middle_name: e.target.value }))}
+                  />
+                </div>
+                <div>
                   <label className="form-label">Last Name *</label>
                   <input
                     className={`form-input ${registerErrors.lastname ? 'border-red-400 focus:border-red-500' : ''}`}
@@ -582,37 +580,21 @@ export default function Checkout() {
                   {registerErrors.lastname && <p className="text-xs text-red-500 mt-1">{registerErrors.lastname}</p>}
                 </div>
                 <div>
-                  <label className="form-label">Password *</label>
-                  <input
-                    type="password"
-                    className={`form-input ${registerErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
-                    value={borrowerForm.password}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setBorrowerForm((prev) => ({ ...prev, password: value }));
-                      setRegisterErrors((prev) => ({ ...prev, password: undefined }));
-                      setRegisterFormError('');
-                    }}
+                  <label className="form-label">College *</label>
+                  <select
+                    className="form-input"
+                    value={borrowerForm.college}
+                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, college: e.target.value }))}
                     required
-                  />
-                  {registerErrors.password && <p className="text-xs text-red-500 mt-1">{registerErrors.password}</p>}
+                  >
+                    <option value="CTECH">CTECH</option>
+                    <option value="CFES">CFES</option>
+                    <option value="CBM">CBM</option>
+                    <option value="COAS">COAS</option>
+                    <option value="CTE">CTE</option>
+                  </select>
                 </div>
-                <div>
-                  <label className="form-label">Confirm Password *</label>
-                  <input
-                    type="password"
-                    className={`form-input ${registerErrors.confirm_password ? 'border-red-400 focus:border-red-500' : ''}`}
-                    value={borrowerForm.confirm_password}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setBorrowerForm((prev) => ({ ...prev, confirm_password: value }));
-                      setRegisterErrors((prev) => ({ ...prev, confirm_password: undefined }));
-                      setRegisterFormError('');
-                    }}
-                    required
-                  />
-                  {registerErrors.confirm_password && <p className="text-xs text-red-500 mt-1">{registerErrors.confirm_password}</p>}
-                </div>
+
                 <div>
                   <label className="form-label">Mobile Phone</label>
                   <input
@@ -630,15 +612,7 @@ export default function Checkout() {
                   />
                   {registerErrors.mobile_phone && <p className="text-xs text-red-500 mt-1">{registerErrors.mobile_phone}</p>}
                 </div>
-                <div>
-                  <label className="form-label">Phone</label>
-                  <input
-                    className="form-input"
-                    value={borrowerForm.phone}
-                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, phone: e.target.value }))}
-                    placeholder="Landline (optional)"
-                  />
-                </div>
+
                 <div className="md:col-span-2">
                   <label className="form-label">Email</label>
                   <input
@@ -658,15 +632,7 @@ export default function Checkout() {
                     placeholder="Complete address"
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="form-label">Notes</label>
-                  <input
-                    className="form-input"
-                    value={borrowerForm.notes}
-                    onChange={(e) => setBorrowerForm((prev) => ({ ...prev, notes: e.target.value }))}
-                    placeholder="Optional notes"
-                  />
-                </div>
+
               </div>
 
               <div className="flex justify-end gap-2 pt-2">

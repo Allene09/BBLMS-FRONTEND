@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { PiCheck as FiCheck, PiMagnifyingGlass as FiSearch, PiArrowCounterClockwise as FiArrowLeft, PiUser as FiUser, PiBook as FiBook, PiClock as FiClock, PiMoney as FiMoney, PiWarningCircle as FiAlertCircle } from 'react-icons/pi';
+import PaymentModal from '../components/PaymentModal';
 
 export default function Checkin() {
   const [search, setSearch] = useState('');
   const [allLoans, setAllLoans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [returningId, setReturningId] = useState(null);
+  const [payingLoan, setPayingLoan] = useState(null);
 
   const loadActiveLoans = async () => {
     setLoading(true);
@@ -186,18 +188,28 @@ export default function Checkin() {
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      <button
-                        className="group/btn relative inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-emerald-400"
-                        disabled={returningId === loan.id}
-                        onClick={() => handleReturnBook(loan)}
-                      >
-                        {returningId === loan.id ? (
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <FiCheck size={16} className="group-hover/btn:scale-125 transition-transform" />
-                        )}
-                        <span>{returningId === loan.id ? 'Returning...' : 'Process Return'}</span>
-                      </button>
+                      {loan.current_status === 'Overdue' ? (
+                        <button
+                          className="group/btn relative inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/40 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-red-400"
+                          onClick={() => setPayingLoan(loan)}
+                        >
+                          <FiMoney size={16} className="group-hover/btn:scale-125 transition-transform" />
+                          <span>Pay Fine</span>
+                        </button>
+                      ) : (
+                        <button
+                          className="group/btn relative inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-emerald-400"
+                          disabled={returningId === loan.id}
+                          onClick={() => handleReturnBook(loan)}
+                        >
+                          {returningId === loan.id ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <FiCheck size={16} className="group-hover/btn:scale-125 transition-transform" />
+                          )}
+                          <span>{returningId === loan.id ? 'Returning...' : 'Process Return'}</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -206,6 +218,23 @@ export default function Checkin() {
           </div>
         </div>
       </div>
+      {payingLoan && (
+        <PaymentModal
+          fine={{
+            transaction_id: payingLoan.id,
+            total_fine: payingLoan.suggested_fine,
+            borrower_name: payingLoan.borrower_name,
+            borrower_id_no: payingLoan.borrower_id_no,
+            book_title: payingLoan.book_title,
+            due_date: payingLoan.due_date,
+          }}
+          onClose={() => setPayingLoan(null)}
+          onSuccess={() => {
+            setPayingLoan(null);
+            loadActiveLoans('');
+          }}
+        />
+      )}
     </div>
   );
 }

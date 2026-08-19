@@ -48,6 +48,16 @@ export function AuthProvider({ children }) {
     } else {
       setLoading(false);
     }
+
+    // Synchronize auth state across multiple tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        // If the token changes (logged into a different account or logged out in another tab), reload the page to sync state
+        window.location.reload();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const login = async (user_id, password) => {

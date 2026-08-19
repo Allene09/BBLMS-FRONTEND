@@ -20,6 +20,7 @@ export default function Books() {
   const navigate = useNavigate();
   const canManageBooks = ['LIBRARIAN'].includes(user?.access_right);
   const canAddBooks = ['LIBRARIAN', 'STAFF'].includes(user?.access_right);
+  const canDeleteBooks = ['LIBRARIAN', 'STAFF'].includes(user?.access_right);
   const canIncrementCopies = user?.access_right === 'STAFF';
   const canSelfReserve = !canManageBooks;
   const [books, setBooks] = useState([]);
@@ -38,7 +39,7 @@ export default function Books() {
   const [decreaseCopyBook, setDecreaseCopyBook] = useState(null);
   const [decreaseQuantity, setDecreaseQuantity] = useState(1);
   
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, onConfirm: null });
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, onConfirm: null, title: 'Confirm Action', message: '' });
 
   // Borrow states
   const [showBorrowModal, setShowBorrowModal] = useState(false);
@@ -160,15 +161,22 @@ export default function Books() {
 
   const handleDelete = async () => {
     if (!selected) return toast.error('Select a book first');
-    if (!window.confirm(`Delete "${selected.title}"?`)) return;
-    try {
-      await api.delete(`/books/${selected.id}`);
-      toast.success('Book deleted');
-      setSelected(null);
-      fetchBooks();
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Delete failed');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Book',
+      message: `Are you sure you want to delete "${selected.title}"? This action cannot be undone.`,
+      onConfirm: async () => {
+        setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' });
+        try {
+          await api.delete(`/books/${selected.id}`);
+          toast.success('Book deleted');
+          setSelected(null);
+          fetchBooks();
+        } catch (err) {
+          toast.error(err.response?.data?.error || 'Delete failed');
+        }
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -207,8 +215,10 @@ export default function Books() {
     
     setConfirmDialog({
       isOpen: true,
+      title: 'Confirm Action',
+      message: 'This will update the inventory count immediately. Continue?',
       onConfirm: async () => {
-        setConfirmDialog({ isOpen: false, onConfirm: null });
+        setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' });
         setAddingCopyId(addCopyBook.id);
         setShowAddCopyModal(false);
         try {
@@ -251,8 +261,10 @@ export default function Books() {
 
     setConfirmDialog({
       isOpen: true,
+      title: 'Confirm Action',
+      message: 'This will update the inventory count immediately. Continue?',
       onConfirm: async () => {
-        setConfirmDialog({ isOpen: false, onConfirm: null });
+        setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' });
         setAddingCopyId(decreaseCopyBook.id);
         setShowDecreaseCopyModal(false);
         try {
@@ -387,14 +399,14 @@ export default function Books() {
                 <FiPlus size={16} /> New Book
               </button>
             )}
-            {canManageBooks && (
-              <button className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all w-max ${selected ? 'bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200' : 'bg-white/50 text-slate-400 border-white/60 cursor-not-allowed'}`} onClick={handleEdit} disabled={!selected}>
-                <FiEdit2 size={16} /> Edit
+            {canDeleteBooks && (
+              <button className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all w-max ${selected ? 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200' : 'bg-white/50 text-slate-400 border-white/60 cursor-not-allowed'}`} onClick={handleDelete} disabled={!selected}>
+                <FiTrash2 size={16} /> Delete Book
               </button>
             )}
             {canManageBooks && (
-              <button className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all w-max ${selected ? 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200' : 'bg-white/50 text-slate-400 border-white/60 cursor-not-allowed'}`} onClick={handleDelete} disabled={!selected}>
-                <FiTrash2 size={16} /> Delete
+              <button className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all w-max ${selected ? 'bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200' : 'bg-white/50 text-slate-400 border-white/60 cursor-not-allowed'}`} onClick={handleEdit} disabled={!selected}>
+                <FiEdit2 size={16} /> Edit
               </button>
             )}
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white/60 border border-white/60 hover:bg-white transition-all shadow-sm w-max" onClick={fetchBooks}>
@@ -950,7 +962,7 @@ export default function Books() {
 
         {/* Global Confirmation Modal */}
         {confirmDialog.isOpen && (
-          <div className="modal-overlay" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })} style={{ zIndex: 60 }}>
+          <div className="modal-overlay" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' })} style={{ zIndex: 60 }}>
             <div 
               className="modal-content" 
               style={{ maxWidth: '400px' }} 
@@ -961,15 +973,15 @@ export default function Books() {
               aria-describedby="confirm-dialog-desc"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 id="confirm-dialog-title" className="text-lg font-bold text-gray-800">Confirm Action</h2>
-                <button onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
+                <h2 id="confirm-dialog-title" className="text-lg font-bold text-gray-800">{confirmDialog.title || 'Confirm Action'}</h2>
+                <button onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' })} className="text-gray-400 hover:text-gray-600"><FiX size={20} /></button>
               </div>
               <div className="space-y-4">
                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                  <p id="confirm-dialog-desc" className="text-sm font-medium text-amber-700">This will update the inventory count immediately. Continue?</p>
+                  <p id="confirm-dialog-desc" className="text-sm font-medium text-amber-700">{confirmDialog.message}</p>
                 </div>
                 <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-                  <button type="button" className="btn btn-secondary" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null })}>Cancel</button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setConfirmDialog({ isOpen: false, onConfirm: null, title: '', message: '' })}>Cancel</button>
                   <button type="button" className="btn btn-primary bg-indigo-600 border border-indigo-600 hover:bg-indigo-700 text-white" autoFocus onClick={() => confirmDialog.onConfirm && confirmDialog.onConfirm()}>Confirm</button>
                 </div>
               </div>

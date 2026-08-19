@@ -14,7 +14,7 @@ const highlights = [
 
 const emptySignup = {
   id_no: '', firstname: '', middle_name: '', lastname: '', gender: 'Male', college: 'CTECH',
-  mobile_phone: '', phone: '', email: '', address: '', notes: '', type: 'STUDENT'
+  mobile_phone: '', email: '', address: '', type: 'STUDENT'
 };
 
 // Floating particles component
@@ -500,16 +500,7 @@ export default function Login() {
                         onChange={(e) => handleSignupChange('mobile_phone', e.target.value)}
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
-                      <input
-                        type="tel"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
-                        placeholder="Landline (optional)"
-                        value={signupForm.phone}
-                        onChange={(e) => handleSignupChange('phone', e.target.value)}
-                      />
-                    </div>
+
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1.5">Email</label>
@@ -544,16 +535,7 @@ export default function Login() {
                         <option value="FACULTY">Faculty</option>
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Notes</label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
-                        placeholder="Additional notes (optional)"
-                        value={signupForm.notes}
-                        onChange={(e) => handleSignupChange('notes', e.target.value)}
-                      />
-                    </div>
+
                   </div>
                 </div>
               </div>
