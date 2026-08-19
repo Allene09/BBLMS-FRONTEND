@@ -15,6 +15,7 @@ import {
   PiUser as FiUser,
   PiEye as FiEye,
   PiEyeSlash as FiEyeOff,
+  PiPencilSimple as FiEdit,
 } from 'react-icons/pi';
 
 const blankBorrower = {
@@ -24,10 +25,8 @@ const blankBorrower = {
   gender: 'Male',
   college: 'CTECH',
   mobile_phone: '',
-  phone: '',
   email: '',
   address: '',
-  notes: '',
   type: 'Student',
 };
 
@@ -43,6 +42,7 @@ export default function Profile() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [borrower, setBorrower] = useState({ ...blankBorrower });
 
   useEffect(() => {
@@ -66,10 +66,8 @@ export default function Profile() {
           gender: borrowed.gender || 'Male',
           college: borrowed.college || 'CTECH',
           mobile_phone: borrowed.mobile_phone || '',
-          phone: borrowed.phone || '',
           email: borrowed.email || '',
           address: borrowed.address || '',
-          notes: borrowed.notes || '',
           type: borrowed.type || 'Student',
         });
       } catch (err) {
@@ -128,10 +126,8 @@ export default function Profile() {
         gender: borrower.gender,
         college: borrower.college,
         mobile_phone: borrower.mobile_phone.trim(),
-        phone: borrower.phone.trim(),
         email: borrower.email.trim(),
         address: borrower.address.trim(),
-        notes: borrower.notes.trim(),
         type: borrower.type,
       };
 
@@ -149,16 +145,15 @@ export default function Profile() {
           gender: res.data.borrower.gender || 'Male',
           college: res.data.borrower.college || 'CTECH',
           mobile_phone: res.data.borrower.mobile_phone || '',
-          phone: res.data.borrower.phone || '',
           email: res.data.borrower.email || '',
           address: res.data.borrower.address || '',
-          notes: res.data.borrower.notes || '',
           type: res.data.borrower.type || 'Student',
         });
       }
       setPassword('');
       setConfirmPassword('');
       await refreshUser();
+      setIsEditing(false);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to update profile');
     } finally {
@@ -193,18 +188,27 @@ export default function Profile() {
             <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight drop-shadow-sm">Profile</h1>
             <p className="text-sm text-slate-600/80 font-semibold mt-1">Update your account and borrower information from one place.</p>
           </div>
+          <button 
+            type="button"
+            onClick={() => setIsEditing(!isEditing)}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all ${isEditing ? 'bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200' : 'bg-white/60 text-slate-700 border-white/70 hover:bg-white shadow-sm'}`}
+          >
+            <FiEdit size={16} /> {isEditing ? 'Cancel Editing' : 'Edit Profile'}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6 items-start">
           <div className="bg-white/35 backdrop-blur-2xl rounded-[2rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.05)] overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
             <div className="p-6 relative z-10">
-              <div className="w-20 h-20 rounded-[1.75rem] bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-black shadow-xl shadow-blue-500/20">
-                {profile.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
-              </div>
-              <div className="mt-5">
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">{profile.username || user?.username}</h2>
-                <p className="text-sm font-semibold text-slate-500 mt-1">{user?.access_right}</p>
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 rounded-[1.75rem] bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-black shadow-xl shadow-blue-500/20">
+                  {profile.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div className="mt-5">
+                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">{profile.username || user?.username}</h2>
+                  <p className="text-sm font-semibold text-slate-500 mt-1">{user?.access_right}</p>
+                </div>
               </div>
 
               <div className="mt-6 space-y-3">
@@ -226,7 +230,7 @@ export default function Profile() {
 
           <form onSubmit={handleSubmit} className="bg-white/35 backdrop-blur-2xl rounded-[2rem] border border-white/60 shadow-[0_8px_40px_rgb(0,0,0,0.05)] overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
-            <div className="p-6 lg:p-8 relative z-10 space-y-8">
+            <fieldset disabled={!isEditing} className="p-6 lg:p-8 relative z-10 space-y-8 min-w-0">
               <section>
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center border border-white/70 shadow-sm">
@@ -257,6 +261,18 @@ export default function Profile() {
                     />
                   </div>
                   <div>
+                    <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Type</label>
+                    <select
+                      className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white"
+                      value={borrower.type}
+                      onChange={(e) => handleBorrowerChange('type', e.target.value)}
+                    >
+                      <option value="Student">Student</option>
+                      <option value="Faculty">Faculty</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">New Password</label>
                     <div className="relative">
                       <input
@@ -275,7 +291,7 @@ export default function Profile() {
                       </button>
                     </div>
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Confirm Password</label>
                     <div className="relative">
                       <input
@@ -375,15 +391,6 @@ export default function Profile() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1 flex items-center gap-1.5"><FiPhone size={12} /> Phone</label>
-                      <input
-                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
-                        value={borrower.phone}
-                        onChange={(e) => handleBorrowerChange('phone', e.target.value)}
-                        placeholder="Optional"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
                       <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1 flex items-center gap-1.5"><FiMail size={12} /> Email</label>
                       <input
                         type="email"
@@ -402,40 +409,21 @@ export default function Profile() {
                         placeholder="Complete address"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Type</label>
-                      <select
-                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
-                        value={borrower.type}
-                        onChange={(e) => handleBorrowerChange('type', e.target.value)}
-                      >
-                        <option value="Student">Student</option>
-                        <option value="Faculty">Faculty</option>
-                        <option value="Others">Others</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500 mb-2 pl-1">Notes</label>
-                      <input
-                        className="w-full bg-white/60 border border-white/70 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white"
-                        value={borrower.notes}
-                        onChange={(e) => handleBorrowerChange('notes', e.target.value)}
-                        placeholder="Optional notes"
-                      />
-                    </div>
                   </div>
                 </section>
 
-              <div className="flex justify-end pt-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.25)]"
-                >
-                  <FiSave size={16} /> {saving ? 'Saving...' : 'Save Profile'}
-                </button>
-              </div>
-            </div>
+              {isEditing && (
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-[0_8px_20px_rgba(79,70,229,0.25)]"
+                  >
+                    <FiSave size={16} /> {saving ? 'Saving...' : 'Save Profile'}
+                  </button>
+                </div>
+              )}
+            </fieldset>
           </form>
         </div>
       </div>

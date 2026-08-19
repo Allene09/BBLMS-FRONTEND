@@ -19,13 +19,13 @@ export default function BorrowRecords() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
-  const loadRecords = async () => {
+  const loadRecords = async (overrides = {}) => {
     setLoading(true);
     try {
       const res = await api.get('/transactions', {
         params: {
-          status: status || null,
-          search: search || null,
+          status: overrides.status !== undefined ? (overrides.status || null) : (status || null),
+          search: overrides.search !== undefined ? (overrides.search || null) : (search || null),
         },
       });
       setRows(Array.isArray(res.data) ? res.data : []);
@@ -83,8 +83,9 @@ export default function BorrowRecords() {
                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236366f1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 7l5 5 5-5'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                 value={status} 
                 onChange={(e) => {
-                  setStatus(e.target.value);
-                  setTimeout(loadRecords, 0); // trigger reload immediately since status filtering happens server-side
+                  const newStatus = e.target.value;
+                  setStatus(newStatus);
+                  loadRecords({ status: newStatus });
                 }}
               >
                 <option value="">All Transactions</option>
@@ -142,7 +143,7 @@ export default function BorrowRecords() {
                   setSearch('');
                   setFromDate('');
                   setToDate('');
-                  setTimeout(loadRecords, 0);
+                  loadRecords({ status: '', search: '' });
                 }}
               >
                 <FiX size={16} /> Clear Filters
