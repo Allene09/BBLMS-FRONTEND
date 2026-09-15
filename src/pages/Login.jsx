@@ -445,6 +445,17 @@ export default function Login() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Lastname <span className="text-red-400">*</span></label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
+                        placeholder="Enter lastname"
+                        value={signupForm.lastname}
+                        onChange={(e) => handleSignupChange('lastname', e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Firstname <span className="text-red-400">*</span></label>
                       <input
                         type="text"
@@ -456,24 +467,13 @@ export default function Login() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Middle Name</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Middlename</label>
                       <input
                         type="text"
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
-                        placeholder="Enter middle name"
+                        placeholder="Enter middlename"
                         value={signupForm.middle_name}
                         onChange={(e) => handleSignupChange('middle_name', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Lastname <span className="text-red-400">*</span></label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all bg-gray-50/50"
-                        placeholder="Enter lastname"
-                        value={signupForm.lastname}
-                        onChange={(e) => handleSignupChange('lastname', e.target.value)}
-                        required
                       />
                     </div>
                   </div>

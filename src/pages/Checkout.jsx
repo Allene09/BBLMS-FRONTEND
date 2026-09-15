@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiPlus as FiPlus, PiX as FiX, PiUser as FiUser, PiBook as FiBook, PiCalendar as FiCalendar, PiFloppyDisk as FiSave } from 'react-icons/pi';
+import { PiMagnifyingGlass as FiSearch, PiCheck as FiCheck, PiPlus as FiPlus, PiX as FiX, PiUser as FiUser, PiBook as FiBook, PiCalendar as FiCalendar, PiFloppyDisk as FiSave, PiWarning as FiWarning } from 'react-icons/pi';
 
 const emptyBorrowerForm = {
   id_no: '',
@@ -31,6 +31,9 @@ export default function Checkout() {
   const [borrowerForm, setBorrowerForm] = useState({ ...emptyBorrowerForm });
   const [registerErrors, setRegisterErrors] = useState({});
   const [registerFormError, setRegisterFormError] = useState('');
+  const [borrowerOverdue, setBorrowerOverdue] = useState(false);
+  const [borrowerOverdueCount, setBorrowerOverdueCount] = useState(0);
+  const [checkingOverdue, setCheckingOverdue] = useState(false);
 
   useEffect(() => {
     const due = new Date();
@@ -39,6 +42,38 @@ export default function Checkout() {
     loadBorrowers('');
     loadBooks('');
   }, []);
+
+  // Check for overdue books whenever a borrower is selected
+  useEffect(() => {
+    if (!selectedBorrower) {
+      setBorrowerOverdue(false);
+      setBorrowerOverdueCount(0);
+      return;
+    }
+    const checkOverdue = async () => {
+      setCheckingOverdue(true);
+      try {
+        const res = await api.get(`/transactions/borrower/${selectedBorrower.id}`);
+        const loans = Array.isArray(res.data) ? res.data : [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const overdueLoans = loans.filter(l => {
+          if (l.status === 'Returned') return false;
+          const due = new Date(l.due_date);
+          due.setHours(0, 0, 0, 0);
+          return due < today;
+        });
+        setBorrowerOverdue(overdueLoans.length > 0);
+        setBorrowerOverdueCount(overdueLoans.length);
+      } catch {
+        setBorrowerOverdue(false);
+        setBorrowerOverdueCount(0);
+      } finally {
+        setCheckingOverdue(false);
+      }
+    };
+    checkOverdue();
+  }, [selectedBorrower]);
 
   const loadBorrowers = async () => {
     try {
@@ -180,7 +215,7 @@ export default function Checkout() {
   const borrowerResultCount = filteredBorrowers.length;
   const bookResultCount = filteredBooks.length;
   const totalVisibleCopies = filteredBooks.reduce((sum, book) => sum + Number(book.copies_available || 0), 0);
-  const canSaveBorrow = Boolean(selectedBorrower && selectedBook && loanDate && dueDate && dueDate >= loanDate);
+  const canSaveBorrow = Boolean(selectedBorrower && selectedBook && loanDate && dueDate && dueDate >= loanDate && !borrowerOverdue);
 
   return (
     <div className="min-h-[calc(100vh-80px)] -m-6 p-6 lg:p-10 relative overflow-hidden flex flex-col font-sans">
@@ -284,21 +319,25 @@ export default function Checkout() {
                         <tr><td colSpan={3} className="text-center text-gray-400 py-8 font-medium text-sm">No borrowers found</td></tr>
                       ) : filteredBorrowers.map((borrower) => {
                         const isSelected = selectedBorrower?.id === borrower.id;
+                        const isOverdue = isSelected && borrowerOverdue;
                         return (
                           <tr
                             key={borrower.id}
                             onClick={() => setSelectedBorrower(borrower)}
-                            className={`cursor-pointer transition-colors group ${isSelected ? 'bg-blue-100/50 hover:bg-blue-200/50' : 'hover:bg-white/40'}`}
+                            className={`cursor-pointer transition-colors group ${isOverdue ? 'bg-red-50/60 hover:bg-red-100/60' : isSelected ? 'bg-blue-100/50 hover:bg-blue-200/50' : 'hover:bg-white/40'}`}
                           >
                             <td className="p-3 pl-4 relative">
-                              {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-md" />}
-                              <span className={`font-mono text-sm ${isSelected ? 'text-blue-700 font-bold' : 'text-blue-900/70 font-semibold group-hover:text-blue-600'}`}>{borrower.id_no}</span>
+                              {isSelected && <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-md ${isOverdue ? 'bg-red-500' : 'bg-blue-500'}`} />}
+                              <span className={`font-mono text-sm ${isOverdue ? 'text-red-700 font-bold' : isSelected ? 'text-blue-700 font-bold' : 'text-blue-900/70 font-semibold group-hover:text-blue-600'}`}>{borrower.id_no}</span>
                             </td>
-                            <td className={`p-3 text-sm ${isSelected ? 'text-blue-950 font-bold' : 'text-blue-900 font-semibold'}`}>
-                              {borrower.firstname} {borrower.lastname}
+                            <td className={`p-3 text-sm ${isOverdue ? 'text-red-950 font-bold' : isSelected ? 'text-blue-950 font-bold' : 'text-blue-900 font-semibold'}`}>
+                              <span className="flex items-center gap-1.5">
+                                {borrower.firstname} {borrower.lastname}
+                                {isOverdue && <FiWarning size={13} className="text-red-500 flex-shrink-0" />}
+                              </span>
                             </td>
                             <td className="p-3 pr-4">
-                              <span className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border backdrop-blur-sm ${isSelected ? 'bg-indigo-100/50 text-indigo-700 border-indigo-200/50' : 'bg-blue-100/50 text-blue-700 border-blue-200/50'}`}>
+                              <span className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border backdrop-blur-sm ${isOverdue ? 'bg-red-100/50 text-red-700 border-red-200/50' : isSelected ? 'bg-indigo-100/50 text-indigo-700 border-indigo-200/50' : 'bg-blue-100/50 text-blue-700 border-blue-200/50'}`}>
                                 {borrower.type}
                               </span>
                             </td>
@@ -473,6 +512,24 @@ export default function Checkout() {
               {dueDate && loanDate && dueDate < loanDate && (
                 <div className="mt-4 flex items-center gap-2 p-3 bg-red-100/60 text-red-700 rounded-xl border border-red-200/50 backdrop-blur-sm font-semibold text-sm shadow-sm">
                   <FiX className="text-red-500" size={18} /> Due date cannot be earlier than borrow date.
+                </div>
+              )}
+              {borrowerOverdue && (
+                <div className="mt-4 flex items-start gap-3 p-4 bg-red-100/70 text-red-800 rounded-xl border border-red-300/60 backdrop-blur-sm shadow-sm">
+                  <FiWarning className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+                  <div>
+                    <p className="font-black text-sm">
+                      Borrower has {borrowerOverdueCount} overdue book{borrowerOverdueCount > 1 ? 's' : ''}
+                    </p>
+                    <p className="text-xs font-medium mt-0.5 text-red-700/80">
+                      All overdue books must be returned before this borrower can borrow again.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {checkingOverdue && selectedBorrower && (
+                <div className="mt-4 flex items-center gap-2 p-3 bg-blue-50/60 text-blue-600 rounded-xl border border-blue-100/60 text-xs font-semibold">
+                  <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> Checking borrower overdue status...
                 </div>
               )}
             </div>
