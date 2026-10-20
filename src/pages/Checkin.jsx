@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiCheck as FiCheck, PiMagnifyingGlass as FiSearch, PiArrowCounterClockwise as FiArrowLeft, PiUser as FiUser, PiBook as FiBook, PiClock as FiClock, PiMoney as FiMoney, PiWarningCircle as FiAlertCircle } from 'react-icons/pi';
-import PaymentModal from '../components/PaymentModal';
+import {
+  PiCheck as FiCheck,
+  PiMagnifyingGlass as FiSearch,
+  PiArrowCounterClockwise as FiArrowLeft,
+  PiUser as FiUser,
+  PiBook as FiBook,
+  PiClock as FiClock,
+  PiWarningCircle as FiAlertCircle,
+  PiWarningOctagon as FiIncident,
+} from 'react-icons/pi';
 
 export default function Checkin() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [allLoans, setAllLoans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [returningId, setReturningId] = useState(null);
-  const [payingLoan, setPayingLoan] = useState(null);
 
   const loadActiveLoans = async () => {
     setLoading(true);
@@ -30,17 +39,10 @@ export default function Checkin() {
   const handleReturnBook = async (loan) => {
     setReturningId(loan.id);
     try {
-      const res = await api.post(`/transactions/checkin/${loan.id}`, {
+      await api.post(`/transactions/checkin/${loan.id}`, {
         return_date: new Date().toISOString().split('T')[0],
       });
-
-      const totalFine = Number(res.data?.totalFine || 0);
-      if (totalFine > 0) {
-        toast.success(`Book returned. Fine: PHP ${totalFine.toFixed(2)}`);
-      } else {
-        toast.success('Book returned successfully');
-      }
-
+      toast.success('Book returned successfully');
       await loadActiveLoans();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to return book');
@@ -83,7 +85,7 @@ export default function Checkin() {
               Return Book
             </h1>
             <p className="text-sm lg:text-base text-teal-900/60 font-semibold mt-2 ml-1">
-              Process incoming active loans with automatic fine calculation
+              Process incoming returns for active and overdue loans
             </p>
           </div>
         </div>
@@ -110,14 +112,13 @@ export default function Checkin() {
           <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
           
           <div className="overflow-x-auto flex-1 custom-scrollbar relative z-10">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
+            <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
                 <tr className="border-b border-white/50">
-                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 w-[20%]"><div className="flex items-center gap-2"><FiUser size={14} className="text-teal-600"/> Borrower</div></th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 w-[30%]"><div className="flex items-center gap-2"><FiBook size={14} className="text-teal-600"/> Book Details</div></th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 w-[24%]"><div className="flex items-center gap-2"><FiUser size={14} className="text-teal-600"/> Borrower</div></th>
+                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 w-[34%]"><div className="flex items-center gap-2"><FiBook size={14} className="text-teal-600"/> Book Details</div></th>
                   <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20"><div className="flex items-center gap-2"><FiClock size={14} className="text-orange-500"/> Due Date</div></th>
                   <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 text-center">Days Overdue</th>
-                  <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 text-right"><div className="flex items-center justify-end gap-2"><FiMoney size={14} className="text-teal-600"/> Suggested Fine</div></th>
                   <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 text-center">Status</th>
                   <th className="p-5 text-[11px] font-black uppercase tracking-[0.2em] text-teal-900/70 bg-white/20 backdrop-blur-md sticky top-0 z-20 text-center">Action</th>
                 </tr>
@@ -125,7 +126,7 @@ export default function Checkin() {
               <tbody className="divide-y divide-white/40">
                 {loading ? (
                    <tr>
-                    <td colSpan={7} className="text-center py-20">
+                    <td colSpan={6} className="text-center py-20">
                       <div className="inline-flex flex-col items-center gap-3">
                         <FiSearch size={32} className="animate-pulse text-teal-500" />
                         <span className="text-sm font-bold text-teal-900/50 uppercase tracking-widest">Scanning Active Loans...</span>
@@ -134,7 +135,7 @@ export default function Checkin() {
                   </tr>
                 ) : filteredLoans.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-24">
+                    <td colSpan={6} className="text-center py-24">
                        <div className="inline-flex flex-col items-center gap-4">
                         <div className="w-20 h-20 rounded-full bg-white/50 flex items-center justify-center border border-white/60 shadow-lg shadow-teal-500/10">
                           <FiAlertCircle size={36} className="text-teal-400" />
@@ -175,26 +176,27 @@ export default function Checkin() {
                          <span className="text-teal-900/40 font-bold text-xl">-</span>
                        )}
                     </td>
-                    <td className="p-4 text-right">
-                       <p className="font-black text-teal-950 text-base flex flex-col items-end leading-tight">
-                        <span className="text-[9px] font-bold text-teal-900/40 uppercase tracking-widest mb-0.5">PHP</span>
-                        {Number(loan.suggested_fine || 0).toFixed(2)}
-                      </p>
+                    <td className="p-4 text-center">
+                       {loan.pending_incident_type ? (
+                         <div className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shadow-sm backdrop-blur-sm bg-orange-100/70 text-orange-800 border-orange-300 animate-pulse">
+                           <FiIncident size={11} /> {loan.pending_incident_type}
+                         </div>
+                       ) : (
+                         <div className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shadow-sm backdrop-blur-sm
+                          ${loan.current_status === 'Overdue' ? 'bg-red-100/60 text-red-700 border-red-200/50' : 'bg-indigo-100/60 text-indigo-700 border-indigo-200/50'}`}>
+                          {loan.current_status}
+                        </div>
+                       )}
                     </td>
                     <td className="p-4 text-center">
-                       <div className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shadow-sm backdrop-blur-sm
-                        ${loan.current_status === 'Overdue' ? 'bg-red-100/60 text-red-700 border-red-200/50' : 'bg-indigo-100/60 text-indigo-700 border-indigo-200/50'}`}>
-                        {loan.current_status}
-                      </div>
-                    </td>
-                    <td className="p-4 text-center">
-                      {loan.current_status === 'Overdue' ? (
+                      {loan.pending_incident_type ? (
                         <button
-                          className="group/btn relative inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/40 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-red-400"
-                          onClick={() => setPayingLoan(loan)}
+                          className="group/btn relative inline-flex items-center justify-center gap-1.5 px-4 py-2.5 w-full text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 transition-all duration-300 transform hover:-translate-y-0.5 border border-orange-400"
+                          onClick={() => navigate('/app/incidents')}
+                          title="This loan has a pending incident report. Resolve it before processing return."
                         >
-                          <FiMoney size={16} className="group-hover/btn:scale-125 transition-transform" />
-                          <span>Pay Fine</span>
+                          <FiIncident size={15} className="group-hover/btn:scale-125 transition-transform" />
+                          <span>Review Incident</span>
                         </button>
                       ) : (
                         <button
@@ -218,23 +220,6 @@ export default function Checkin() {
           </div>
         </div>
       </div>
-      {payingLoan && (
-        <PaymentModal
-          fine={{
-            transaction_id: payingLoan.id,
-            total_fine: payingLoan.suggested_fine,
-            borrower_name: payingLoan.borrower_name,
-            borrower_id_no: payingLoan.borrower_id_no,
-            book_title: payingLoan.book_title,
-            due_date: payingLoan.due_date,
-          }}
-          onClose={() => setPayingLoan(null)}
-          onSuccess={() => {
-            setPayingLoan(null);
-            loadActiveLoans('');
-          }}
-        />
-      )}
     </div>
   );
 }

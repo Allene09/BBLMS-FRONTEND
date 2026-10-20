@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { PiArrowsClockwise as FiRefreshCw, PiWarningCircle as FiAlertCircle, PiClock as FiClock, PiUser as FiUser, PiBook as FiBook, PiMoney as FiMoney } from 'react-icons/pi';
+import { PiArrowsClockwise as FiRefreshCw, PiWarningCircle as FiAlertCircle, PiClock as FiClock, PiUser as FiUser, PiBook as FiBook } from 'react-icons/pi';
 
 export default function OverdueMonitoring() {
   const [rows, setRows] = useState([]);
@@ -45,7 +45,7 @@ export default function OverdueMonitoring() {
               Overdue Monitoring
             </h1>
             <p className="text-sm lg:text-base text-indigo-900/60 font-semibold mt-2 ml-1">
-              Real-time radar for outstanding books and accruing fines
+              Real-time monitoring for outstanding borrowed books past their due dates
             </p>
           </div>
           <button 
@@ -58,24 +58,23 @@ export default function OverdueMonitoring() {
           </button>
         </div>
 
-        {/* Dashboard Metrics (Optional extra flair) */}
+        {/* Dashboard Metrics */}
         {!loading && rows.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
               <p className="text-xs font-bold text-indigo-800/60 uppercase tracking-widest mb-1">Total Overdue</p>
               <p className="text-3xl font-black text-indigo-950">{rows.length}</p>
             </div>
             <div className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-              <p className="text-xs font-bold text-indigo-800/60 uppercase tracking-widest mb-1">Highest Fine</p>
-              <p className="text-2xl font-black text-indigo-950 flex items-center gap-1 mt-1">
-                <span className="text-base text-indigo-900/50">PHP</span> 
-                {Math.max(...rows.map(r => Number(r.estimated_fine || 0))).toFixed(2)}
-              </p>
-            </div>
-            <div className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
               <p className="text-xs font-bold text-indigo-800/60 uppercase tracking-widest mb-1">Most Overdue</p>
               <p className="text-2xl font-black text-indigo-950 flex items-center gap-1 mt-1">
                 {Math.max(...rows.map(r => Number(r.days_overdue || 0)))} <span className="text-base text-indigo-900/50">Days</span>
+              </p>
+            </div>
+            <div className="bg-white/30 backdrop-blur-xl border border-white/50 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <p className="text-xs font-bold text-indigo-800/60 uppercase tracking-widest mb-1">Status</p>
+              <p className="text-xl font-black text-amber-700 flex items-center gap-1 mt-1">
+                Notice Required
               </p>
             </div>
           </div>
@@ -86,20 +85,19 @@ export default function OverdueMonitoring() {
           <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
           
           <div className="overflow-x-auto flex-1 custom-scrollbar relative z-10">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="border-b border-white/50">
-                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[25%]"><div className="flex items-center gap-2"><FiUser size={14} className="text-indigo-500"/> Borrower</div></th>
-                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[35%]"><div className="flex items-center gap-2"><FiBook size={14} className="text-indigo-500"/> Book Title</div></th>
-                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[15%]"><div className="flex items-center gap-2"><FiClock size={14} className="text-indigo-500"/> Due Date</div></th>
-                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[10%] text-center">Days</th>
-                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[15%] text-right"><div className="flex items-center justify-end gap-2"><FiMoney size={14} className="text-indigo-500"/> Fine Setup</div></th>
+                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[30%]"><div className="flex items-center gap-2"><FiUser size={14} className="text-indigo-500"/> Borrower</div></th>
+                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[40%]"><div className="flex items-center gap-2"><FiBook size={14} className="text-indigo-500"/> Book Title</div></th>
+                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[18%]"><div className="flex items-center gap-2"><FiClock size={14} className="text-indigo-500"/> Due Date</div></th>
+                  <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-900/70 bg-white/10 backdrop-blur-sm sticky top-0 z-20 w-[12%] text-center">Days Overdue</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/40">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-24">
+                    <td colSpan={4} className="text-center py-24">
                       <div className="inline-flex flex-col items-center gap-3">
                         <FiRefreshCw size={32} className="animate-spin text-indigo-400" />
                         <span className="text-sm font-bold text-indigo-900/50 uppercase tracking-widest">Scanning Databases...</span>
@@ -108,13 +106,13 @@ export default function OverdueMonitoring() {
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-32">
+                    <td colSpan={4} className="text-center py-32">
                       <div className="inline-flex flex-col items-center gap-4">
                         <div className="w-20 h-20 rounded-full bg-white/40 flex items-center justify-center border border-white/60 shadow-lg shadow-indigo-500/10">
                           <FiAlertCircle size={36} className="text-indigo-400" />
                         </div>
                         <span className="text-base font-extrabold text-indigo-950 tracking-tight">Zone Clear</span>
-                        <span className="text-sm font-medium text-indigo-900/60 max-w-sm leading-relaxed">There are currently no overdue books in the library system. Everything is perfectly balanced.</span>
+                        <span className="text-sm font-medium text-indigo-900/60 max-w-sm leading-relaxed">There are currently no overdue books in the library system. Everything is returned on time.</span>
                       </div>
                     </td>
                   </tr>
@@ -143,12 +141,6 @@ export default function OverdueMonitoring() {
                       <div className="inline-flex flex-col items-center justify-center p-2 rounded-xl bg-red-100/50 border border-red-200/50 min-w-[3rem]">
                         <span className="font-black text-red-600 text-base leading-none">{row.days_overdue}</span>
                       </div>
-                    </td>
-                    <td className="p-5 text-right">
-                      <p className="font-black text-indigo-950 text-base flex flex-col items-end leading-tight">
-                        <span className="text-[10px] font-bold text-indigo-900/50 uppercase tracking-widest mb-0.5">PHP</span>
-                        {Number(row.estimated_fine || 0).toFixed(2)}
-                      </p>
                     </td>
                   </tr>
                 ))}
