@@ -101,7 +101,7 @@ function StatusBadge({ status, daysOverdue, incidentStatus, incidentActionTaken 
     );
   }
 
-  if (incidentActionTaken === 'Replacement Required' || incidentStatus === 'Action Required') {
+  if (incidentActionTaken === 'Replacement Required') {
     return (
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-red-100/80 text-red-800 border border-red-300 backdrop-blur-sm animate-pulse">
         <FiIncident size={11} /> Replacement Needed
